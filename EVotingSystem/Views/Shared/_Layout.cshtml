@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EVotingSystem</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+</head>
+<body class="bg-white mainGrid">
+    <header>
+        <nav class="navbar navbar-expand-xl navbar-light bg-light border-bottom border-primary">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/Images/LogoMain.png" class="d-inline-block" style="vertical-align:middle; max-height:100px;">
+                    <div class="d-inline-block text-dark" style="text-align:left; vertical-align:middle; padding-left:15px;">
+                        Student Council
+                        <br />
+                        Secure E-Voting System
+                    </div>
+                </a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">HOME</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="AboutUs" asp-action="Index">ABOUT US</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Candidates" asp-action="Index">CANDIDATES LIST</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Dashboard" asp-action="Index">DASHBOARD</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Contact" asp-action="Index">CONTACT</a>
+                        </li>
+                    </ul>
+                    <form class="form-inline ml-auto">
+                        <button class="btn btn-outline-primary btn-lg" style="border-radius: 40px;" asp-area="" asp-controller="Login" asp-action="Index">LOGIN</button>
+                        <button class="btn btn-primary btn-lg" style="border-radius: 40px;" asp-area="" asp-controller="SignUp" asp-action="Index">SIGN-UP</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="mainMarginBottomFive">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top border-primary footer text-muted">
+        <div class="container">
+            <div class="row row-no-margin justify-content-center">
+                <h1 style="font-size: 2.0vh;" class="col-xs-12 col-no-padding text-dark">Student Council | E-Voting System</h1>
+            </div>
+            <div class="row row-no-margin justify-content-center">
+                <h2 style="font-size: 2.0vh;" class="col-xs-12 col-no-padding text-dark">Published September 2021</h2>
+            </div>
+            <div class="row row-no-margin justify-content-center">
+                <div class="col-xs-12 col-no-padding">
+                    <a href="#" class="fa fa-twitter"></a>
+                </div>
+                <div class="col-xs-12 col-no-padding">
+                    <a href="#" class="fa fa-facebook"></a>
+                </div>
+                <div class="col-xs-12 col-no-padding">
+                    <a href="#" class="fa fa-instagram"></a>
+                </div>
+            </div>
+            <div class="row row-no-margin justify-content-center">
+                <h2 style="font-size:1.5vh;" class="col-xs-12 col-no-padding text-dark">Copyright © 2020 . All rights reserved</h2>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

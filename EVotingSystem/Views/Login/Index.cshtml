@@ -1,0 +1,38 @@
+﻿@model LoginModel
+@{
+    ViewData["Title"] = "Login Page";
+}
+<div class="jumbotron rounded-lg" style="min-height: 65vh">
+    <div class="container-fluid">
+        <h1 class="text-uppercase text-center">Sign In</h1>
+        <form class="mt-md-5" asp-controller="Login" asp-action="Index" method="post">
+            <div class="form-group form-row justify-content-md-center">
+                <div class="col-md-4 mb-3">
+                    <label asp-for="StudentId" for="StudentIdTextBox">Student ID</label>
+                    <input asp-for="StudentId" type="text" class="form-control" id="StudentIdTextBox" aria-describedby="StudentIdHelp" placeholder="Enter your Student ID">
+                    <small id="StudentIdHelp" class="form-text text-muted">We'll never share your student Id with anyone else.</small>
+                </div>
+            </div>
+            <div class="form-group form-row justify-content-md-center">
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Password" for="PasswordTextBox">Password</label>
+                    <a class="text-primary float-right" asp-area="" asp-controller="Login" asp-action="Recover">Forgot your password?</a>
+                    <input asp-for="Password" type="password" class="form-control" id="PasswordTextBox" placeholder="Enter your Password">
+                </div>
+            </div>
+            <div class="form-group form-row justify-content-md-center">
+                <div class="col-md-4 mb-3">
+                    <div class="form-check ml-auto">
+                        <input asp-for="StaySignedIn" type="checkbox" class="form-check-input" id="StaySignedCheckBox">
+                        <label asp-for="StaySignedIn" class="form-check-label" for="StaySignedCheckBox">Stay Signed In</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row justify-content-center">
+                <div class="col-md-4 mb-3">
+                    <button id="LoginButton" type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
