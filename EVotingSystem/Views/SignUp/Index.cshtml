@@ -5,44 +5,73 @@
 <div class="jumbotron rounded-lg" style="min-height: 65vh">
     <div class="container-fluid">
         <h1 class="text-uppercase text-center">Sign Up</h1>
-        <form class="mt-md-5" asp-controller="SignUp" asp-action="Index" method="post">
+        <form class="mt-md-5" asp-controller="SignUp" asp-action="Index" method="post" id="SignUpForm">
             <div class="form-group form-row justify-content-md-center">
                 <div class="col-md-4 mb-3">
-                    <label for="FirstNameTextBox">First Name</label>
-                    <input type="text" class="form-control" id="FirstNameTextBox" aria-describedby="FirstNameHelp" placeholder="Enter your First Name">
-                    <small id="FirstNameHelp" class="form-text text-muted">Your valid first name.</small>
+                    <label asp-for="FirstName" for="FirstNameTextBox">First Name</label>
+                    <input asp-for="FirstName" type="text" class="form-control" id="FirstNameTextBox" aria-describedby="FirstNameHelp" placeholder="Enter your First Name">
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="LastNameTextBox">Last Name</label>
-                    <input type="text" class="form-control" id="LastNameTextBox" aria-describedby="LastNameHelp" placeholder="Enter your Last Name">
-                    <small id="LastNameHelp" class="form-text text-muted">Your valid last name.</small>
+                    <label asp-for="LastName" for="LastNameTextBox">Last Name</label>
+                    <input asp-for="LastName" type="text" class="form-control" id="LastNameTextBox" aria-describedby="LastNameHelp" placeholder="Enter your Last Name">
+                    <span asp-validation-for="LastName" class="text-danger"></span>
                 </div>
             </div>
             <div class="form-group form-row justify-content-md-center">
                 <div class="col-md-4 mb-3">
                     <label asp-for="StudentId" for="StudentIdTextBox">Student ID</label>
                     <input asp-for="StudentId" type="text" class="form-control" id="StudentIdTextBox" aria-describedby="StudentIdHelp" placeholder="Enter your Student ID">
-                    <small id="StudentIdHelp" class="form-text text-muted">We'll never share your student Id with anyone else.</small>
+                    <span asp-validation-for="StudentId" class="text-danger"></span>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label asp-for="NationalId" for="NationalIdTextBox">National ID</label>
                     <input asp-for="NationalId" type="text" class="form-control" id="NationalIdTextBox" aria-describedby="NationalIdHelp" placeholder="Enter your National ID">
                     <small id="NationalIdHelp" class="form-text text-muted">We'll never share your national Id with anyone else.</small>
+                    <span asp-validation-for="NationalId" class="text-danger"></span>
                 </div>
             </div>
             <div class="form-group form-row justify-content-md-center">
                 <div class="col-md-4 mb-3">
                     <label asp-for="Email" for="EmailTextBox">Email Address</label>
                     <input asp-for="Email" type="email" class="form-control" id="EmailTextBox" placeholder="Enter your Email">
+                    <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label asp-for="Password" for="PasswordTextBox">Password</label>
                     <input asp-for="Password" type="password" class="form-control" id="PasswordTextBox" placeholder="Enter your Password">
+                    <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
             </div>
             <div class="form-row justify-content-center">
                 <div class="col-md-4 mb-3">
-                    <button id="SignInButton" type="submit" class="btn btn-primary btn-lg btn-block">Register</button>
+                    <button id="SignUpButton" type="submit" class="btn btn-primary btn-lg btn-block">Register</button>
+                </div>
+            </div>
+            <div class="form-row justify-content-center">
+                <p id="SignUpResult" class="text-danger"></p>
+            </div>
+            <div class="modal fade" id="ConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="ConfirmationModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="ConfirmationModalLabel">Registration Confirmation</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Please check your email and paste the code here</p>
+                            <label asp-for="Code" for="CodeTextBox">Code</label>
+                            <input asp-for="Code" type="text" class="form-control" id="CodeTextBox" placeholder="Your Confirmation Code">
+                            <span asp-validation-for="Code" class="text-danger"></span>
+                        </div>
+                        <div class="modal-footer">
+                            <p id="ConfirmationResult" class="text-success" style="flex:auto;"></p>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button id="SubmitCodeButton" type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
