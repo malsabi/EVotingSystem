@@ -6,8 +6,6 @@ namespace EVotingSystem.Validation
 {
     public class EmailValidation : ValidationAttribute, IClientModelValidator
     {
-        
-
         /// <summary>
         /// Validates the email if its empty or does not contain the domain hct.ac.ae
         /// </summary>

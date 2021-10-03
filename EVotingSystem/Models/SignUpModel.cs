@@ -46,8 +46,6 @@ namespace EVotingSystem.Models
         [MaxLength(30, ErrorMessage = "Password cannot exceed more than 30 characters")]
         public string Password { get; set; }
 
-
-
         public string Phone { get; set; }
 
         public string Code { get; set; }

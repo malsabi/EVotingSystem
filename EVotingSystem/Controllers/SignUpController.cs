@@ -1,7 +1,9 @@
 ﻿using EVotingSystem.DataBase;
 using EVotingSystem.Models;
 using EVotingSystem.Utilities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Net.Mail;
 
 namespace EVotingSystem.Controllers
@@ -10,7 +12,6 @@ namespace EVotingSystem.Controllers
     {
         #region "Fields"
         private readonly FireStoreManager FS = new FireStoreManager();
-        private static string Code = null;
         #endregion
 
         #region "GET"
@@ -38,9 +39,10 @@ namespace EVotingSystem.Controllers
                 }
                 else
                 {
-                    Code = DeviceHelper.GetVerificationCode(25);
-                    SendCodeViaEmail(model, Code);
-                    return Json(new { State = "Valid", Code });
+                    string ConfirmCode = DeviceHelper.GetVerificationCode(7);
+                    SendCodeViaEmail(model, ConfirmCode);
+                    SetConfirmationCode(ConfirmCode);
+                    return Json(new { State = "Valid", ConfirmCode });
                 }
             }
             else
@@ -51,10 +53,19 @@ namespace EVotingSystem.Controllers
         [HttpPost]
         public IActionResult Check(SignUpModel model)
         {
-            if (Code.Equals(model.Code))
+            string ConfirmCode = GetConfirmationCode();
+            if (ConfirmCode != null)
             {
-                FS.AddRegisteredUser(model);
-                return Json(new { State = "Success", model });
+                if (ConfirmCode.Equals(model.Code))
+                {
+                    FS.AddRegisteredUser(model);
+                    RemoveConfirmationCode();
+                    return Json(new { State = "Success", model });
+                }
+                else
+                {
+                    return Json(new { State = "Failed", model });
+                }
             }
             else
             {
@@ -82,6 +93,30 @@ namespace EVotingSystem.Controllers
                 Credentials = new System.Net.NetworkCredential(CompanyEmail, CompanyPassword)
             };
             client.Send(mailMessage);
+        }
+
+        private void SetConfirmationCode(string Code)
+        {
+            HttpContext.Session.SetString("Confirmation", Code);
+        }
+        private string GetConfirmationCode()
+        {
+            return HttpContext.Session.GetString("Confirmation");
+        }
+        private void RemoveConfirmationCode()
+        {
+            string ConfirmCode = GetConfirmationCode();
+            if (ConfirmCode != null)
+            {
+                RemoveCookie("Confirmation");
+            }
+        }
+        public void RemoveCookie(string CookieKey)
+        {
+            Response.Cookies.Append(CookieKey, "", new CookieOptions()
+            {
+                Expires = DateTime.Now.AddDays(-1)
+            });
         }
         #endregion
     }

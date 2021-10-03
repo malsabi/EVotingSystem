@@ -24,7 +24,52 @@ function Redirect(Path, Interval)
     }, Interval);
 }
 
+//Helper Function takes one parameter that represents the Id of the modal.
+//The function hides the modal.
+function HideModal(Id)
+{
+    $(Id).modal('hide');
+}
 
+//Helper Function that resets all of the inputs from the sign up
+function ResetSignUp()
+{
+    let SignUpForm = document.getElementById('SignUpForm');
+    if (SignUpForm != null)
+    {
+        document.getElementById('FirstNameTextBox').value = '';
+        document.getElementById('LastNameTextBox').value = '';
+        document.getElementById('StudentIdTextBox').value = '';
+        document.getElementById('NationalIdTextBox').value = '';
+        document.getElementById('EmailTextBox').value = '';
+        document.getElementById('PasswordTextBox').value = '';
+    }
+}
+
+//Helper Function takes two parameters, that represents the Id of the Control, Content of the Control.
+//The function adds a spinner code and changes the text.
+function ShowSpinner(Id, Content)
+{
+    console.log('Starting ShowSpinner Function');
+    let Button = document.getElementById(Id);
+    //Disable Button
+    Button.setAttribute("disabled", "disabled");
+    //Inject Spinner Code and Replace the Text
+    Button.innerHTML = Button.innerHTML.replace(Content, "Loading..");
+    Button.innerHTML = Button.innerHTML.concat('<div class="spinner-border" role="status" id="spinner"><span class="sr-only">Loading...</span></div>');
+    console.log('Finished ShowSpinner Function');
+}
+
+//Helper Function takes two parameters, that represents the Id of the Control, Content of the Control.
+//The function removes the spinner code and changes the text.
+function HideSpinner(Id, Content)
+{
+    let Button = document.getElementById(Id);
+    //Enable Button
+    Button.removeAttribute("disabled");
+    //Remove all of the Injected Spinner Code and Add a new Text.
+    Button.innerHTML = Content;
+}
 
 //Add the Name Validation that is hooked with the server side validation.
 jQuery.validator.addMethod('NameValidation', function (value, element)
@@ -125,7 +170,6 @@ jQuery.validator.addMethod('EmailValidation', function (value, element)
 });
 $.validator.unobtrusive.adapters.addBool("EmailValidation");
 
-
 //Handle the "Back to main page" Button
 $(document).ready(function ()
 {
@@ -135,15 +179,41 @@ $(document).ready(function ()
     });
 });
 
+//Handle the Modal when it is hidden => an event will be raised and the data will be cleared
+$(document).ready(function ()
+{
+    //Modal event when it is hidden it will be raised.
+    $('.modal').on('hidden.bs.modal', function (e)
+    {
+        document.getElementById('ConfirmationResult').textContent = '';
+        document.getElementById('CodeTextBox').value = '';
+    });
+});
+
+//When the document (page) is ready and loaded, it will do the following:
+//1. It will attempt to clear the sign up form.
+//2. It will attempt to hide the modal.
+$(document).ready(function ()
+{
+    ResetSignUp();
+    HideModal('#ConfirmationModal');
+});
+
 //Handle the Sign Up Register Button POST's request using AJAX
 $(document).ready(function ()
 {
     $("#SignUpButton").on('click', e =>
     {
         e.preventDefault();
+
+        let SignUpResultButton = document.getElementById('SignUpResult');
+        SignUpResultButton.textContent = '';
+
         $("#SignUpForm").validate();
+
         if ($("#SignUpForm").valid())
         {
+            ShowSpinner("SignUpButton", "Register");
             $.ajax
             ({
                 type: "POST",
@@ -152,6 +222,7 @@ $(document).ready(function ()
                 dataType: "json",
                 success: function (response)
                 {
+                    HideSpinner("SignUpButton", "Register");
                     if (response != null)
                     {
                         console.log(response);
@@ -159,27 +230,23 @@ $(document).ready(function ()
                         if (response.state === 'Valid')
                         {
                             $('#ConfirmationModal').modal('show');
-                            document.getElementById('SignUpResult').textContent = '';
-                        }
-                        else if (response.state === 'Error')
-                        {
-                            document.getElementById('SignUpResult').textContent = 'The Account is already registered.';
+                            SignUpResultButton.textContent = '';
                         }
                         else
                         {
-                            console.log('Received a failure state');
+                            SignUpResultButton.textContent = 'The Account is already registered.';
                         }
                     }
                     else
                     {
-                        alert("Something went wrong");
+                        SignUpResultButton.textContent = 'No response from the server.';
                     }
                 }
             });
         }
         else
         {
-            console.log('Validation failed');
+            SignUpResultButton.textContent = 'Invalid data, please insert a valid data';
         } 
     });
 });
@@ -189,7 +256,7 @@ $(document).ready(function () {
     $("#SubmitCodeButton").on('click', e =>
     {
         e.preventDefault();
-        console.log("Submit Code Button Clicked");
+        ShowSpinner('SubmitCodeButton', 'Submit');
         $.ajax
         ({
             type: "POST",
@@ -204,19 +271,21 @@ $(document).ready(function () {
                     let ConfirmationResult = document.getElementById('ConfirmationResult');
                     if (response.state === 'Failed')
                     {
+                        HideSpinner('SubmitCodeButton', 'Submit');
                         ConfirmationResult.classList.replace("text-success", "text-danger");
                         ConfirmationResult.textContent = 'Invalid Confirmation Code';
                     }
-                    else if (response.state === 'Success')
+                    else
                     {
                         ConfirmationResult.classList.replace("text-danger", "text-success");
                         ConfirmationResult.textContent = 'Redirection..';
-                        Redirect('/SignUp/Successful', 2500);
+                        window.setTimeout(function ()
+                        {
+                            HideSpinner('SubmitCodeButton', 'Submit');
+                            Redirect('/SignUp/Successful', 1000);
+                            HideModal('#ConfirmationModal');
+                        }, 2500);
                     }
-                }
-                else
-                {
-                    alert("Something went wrong");
                 }
             }
         });
