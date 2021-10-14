@@ -43,6 +43,7 @@ function ResetSignUp()
         document.getElementById('NationalIdTextBox').value = '';
         document.getElementById('EmailTextBox').value = '';
         document.getElementById('PasswordTextBox').value = '';
+        document.getElementById('PhoneTextBox').value = '';
     }
 }
 
@@ -227,13 +228,11 @@ $(document).ready(function ()
                     {
                         console.log(response);
 
-                        if (response.state === 'Valid')
-                        {
+                        if (response.state === 'Valid') {
                             $('#ConfirmationModal').modal('show');
                             SignUpResultButton.textContent = '';
                         }
-                        else
-                        {
+                        else {
                             SignUpResultButton.textContent = 'The Account is already registered.';
                         }
                     }
@@ -283,6 +282,104 @@ $(document).ready(function () {
                         {
                             HideSpinner('SubmitCodeButton', 'Submit');
                             Redirect('/SignUp/Successful', 1000);
+                            HideModal('#ConfirmationModal');
+                        }, 2500);
+                    }
+                }
+            }
+        });
+    });
+});
+
+
+//Handle the Login Button POST's request using AJAX
+$(document).ready(function () {
+    $("#LoginButton").on('click', e =>
+    {
+        e.preventDefault();
+
+        let LoginResult = document.getElementById('LoginResult');
+        LoginResult.textContent = '';
+
+        $("#LoginForm").validate();
+
+        if ($("#LoginForm").valid())
+        {
+            ShowSpinner("LoginButton", "Submit");
+            $.ajax
+                ({
+                    type: "POST",
+                    url: 'Login?',
+                    data: $("#LoginForm").serialize(),
+                    dataType: "json",
+                    success: function (response)
+                    {
+                        HideSpinner("LoginButton", "Submit");
+                        if (response != null)
+                        {
+                            console.log(response);
+
+                            if (response.state === 'Valid') {
+                                $('#ConfirmationModal').modal('show');
+                                LoginResult.textContent = '';
+                            }
+                            else if (response.state === 'ErrorPassword') {
+                                LoginResult.textContent = 'Invalid Password, please enter a valid password.';
+                            }
+                            else if (response.state === 'ErrorActive') {
+                                LoginResult.textContent = 'You are already signed in.';
+                            }
+                            else {
+                                LoginResult.textContent = 'The Account is not registered.';
+                            }
+                        }
+                        else
+                        {
+                            LoginResult.textContent = 'No response from the server.';
+                        }
+                    }
+                });
+        }
+        else
+        {
+            LoginResult.textContent = 'Invalid data, please insert a valid data';
+        }
+    });
+});
+
+//Handle the login Confirmation Button POST's request using AJAX
+$(document).ready(function ()
+{
+    $("#LoginCodeButton").on('click', e =>
+    {
+        e.preventDefault();
+        ShowSpinner('LoginCodeButton', 'Submit');
+        $.ajax
+        ({
+            type: "POST",
+            url: 'Login/Check',
+            data: $("#LoginForm").serialize(),
+            dataType: "json",
+            success: function (response)
+            {
+                if (response != null)
+                {
+                    console.log(response);
+                    let ConfirmationResult = document.getElementById('ConfirmationResult');
+                    if (response.state === 'Failed')
+                    {
+                        HideSpinner('LoginCodeButton', 'Submit');
+                        ConfirmationResult.classList.replace("text-success", "text-danger");
+                        ConfirmationResult.textContent = 'Invalid Confirmation Code';
+                    }
+                    else
+                    {
+                        ConfirmationResult.classList.replace("text-danger", "text-success");
+                        ConfirmationResult.textContent = 'Redirection..';
+                        window.setTimeout(function ()
+                        {
+                            HideSpinner('LoginCodeButton', 'Submit');
+                            Redirect('/', 500);
                             HideModal('#ConfirmationModal');
                         }, 2500);
                     }

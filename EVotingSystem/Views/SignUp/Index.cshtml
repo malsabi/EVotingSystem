@@ -43,6 +43,15 @@
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
             </div>
+            <div class="form-group form-row justify-content-md-center">
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Phone" for="PhoneTextBox">Phone Number</label>
+                    <input asp-for="Phone" type="tel" class="form-control" id="PhoneTextBox" placeholder="Enter your Phone Number">
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+                <div class="col-md-4 mb-3">
+                </div>
+            </div>
             <div class="form-row justify-content-center">
                 <div class="col-md-4 mb-3">
                     <button id="SignUpButton" type="submit" class="btn btn-primary btn-lg btn-block d-block">

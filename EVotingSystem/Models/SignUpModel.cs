@@ -46,6 +46,9 @@ namespace EVotingSystem.Models
         [MaxLength(30, ErrorMessage = "Password cannot exceed more than 30 characters")]
         public string Password { get; set; }
 
+        [FirestoreProperty]
+        [Required(ErrorMessage = "Please insert your phone number")]
+        [MaxLength(15, ErrorMessage = "Phone number cannot exceed more than 10 digits")]
         public string Phone { get; set; }
 
         public string Code { get; set; }

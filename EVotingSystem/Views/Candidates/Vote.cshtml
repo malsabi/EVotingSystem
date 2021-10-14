@@ -1,0 +1,52 @@
+﻿@using Microsoft.AspNetCore.Html;
+@using EVotingSystem.Helpers;
+@using EVotingSystem.Utilities;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@model CandidateModel
+@{
+    ViewData["Title"] = "Vote Page";
+}
+<div class="jumbotron rounded-lg" style="min-height: 65vh">
+    <div class="container-fluid">
+        <form class="" asp-controller="Candidates" asp-action="Attempt" method="post">
+            @{ StudentModel Student = IdentityHandler.StudentSession(HttpContextAccessor.HttpContext.Request); }
+            <div class="card pt-4 text-center">
+                @(new HtmlString(@CandidateHelper.GetCandidateHtmlImage("25%", "25%", Model.Image, true)));
+                <div class="card-body">
+                    <h6 class="card-title">@Model.Name</h6>
+                    <h5 class="card-title">@Model.Id</h5>
+                    <a class="btn btn-primary btn-block text-white" data-toggle="collapse" data-target="#@("Collapse" + Model.Id)" aria-expanded="false" aria-controls="@("Collapse" + Model.Id)">More Information</a>
+
+                    @if (Student != null && Student.SentVotes != null && Student.SentVotes.Any(c => c.Id == Model.Id))
+                    {
+                        <button class="btn btn-danger btn-block mt-md-2" type="submit">
+                            Unvote
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary btn-block mt-md-2" type="submit">
+                            Vote
+                        </button>
+                    }
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">Last active vote @Model.LastVoteReceived</small>
+                </div>
+                <div class="collapse" id="@("Collapse" + Model.Id)">
+                    <div class="card card-body">
+                        <p>Total Votes: @Model.TotalVotes</p>
+                        <p>Speach: @Model.Speach</p>
+                    </div>
+                </div>
+            </div>
+            @Html.HiddenFor(x => x.Name)
+            @Html.HiddenFor(x => x.Gender)
+            @Html.HiddenFor(x => x.Id)
+            @Html.HiddenFor(x => x.Speach)
+            @Html.HiddenFor(x => x.Image)
+            @Html.HiddenFor(x => x.TotalVotes)
+            @Html.HiddenFor(x => x.LastVoteReceived)
+        </form>
+    </div>
+</div>

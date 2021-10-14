@@ -6,7 +6,7 @@ namespace EVotingSystem.Utilities
     {
         public static string GetVerificationCode(int length)
         {
-            char[] chArray = "abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+            char[] chArray = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
             string str = string.Empty;
             Random random = new Random();
             for (int i = 0; i < length; i++)
