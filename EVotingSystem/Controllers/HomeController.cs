@@ -1,4 +1,5 @@
-﻿using EVotingSystem.DataBase;
+﻿using EVotingSystem.Constants;
+using EVotingSystem.DataBase;
 using EVotingSystem.Models;
 using EVotingSystem.Utilities;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,13 @@ namespace EVotingSystem.Controllers
                 FireStore.LogoutStudent(Identity.StudentSession());
                 //Remove the user session cookie.
                 Identity.LogoutStudent();
+            }
+            else if (Identity.IsAdminLoggedIn())
+            {
+                //Change status in the database
+                FireStore.LogoutAdmin(Identity.AdminSession());
+                //Remove the user session cookie.
+                Identity.LogoutAdmin();
             }
             return RedirectToAction("Index", "Home");
         }

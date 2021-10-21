@@ -22,7 +22,14 @@ namespace EVotingSystem.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            return View();
+            if (Identity.IsStudentLoggedIn() || Identity.IsAdminLoggedIn())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                return View();
+            }
         }
         #endregion
 
@@ -30,7 +37,47 @@ namespace EVotingSystem.Controllers
         [HttpPost]
         public IActionResult Index(AccessPanelModel AccessPanel)
         {
-            return View();
+            AccessPanel.EncryptProperties();
+
+            if (Identity.IsAdminLoggedIn())
+            {
+                return RedirectToPage("Index", "Home");
+            }
+            else
+            {
+                if (ModelState.IsValid)
+                {
+                    if (FireStore.IsAdminRegistered(AccessPanel.Email).Result == false)
+                    {
+                        return Json(new { State = "Error" });
+                    }
+                    else if (FireStore.IsAdminOnline(AccessPanel.Email).Result == true)
+                    {
+                        return Json(new { State = "ErrorActive" });
+                    }
+                    else
+                    {
+                        AdminModel Admin = FireStore.GetAdmin(AccessPanel.Email).Result;
+                        if (Admin.Password.Equals(AccessPanel.Password))
+                        {
+                            //Change status in firebase
+                            FireStore.LoginAdmin(AccessPanel);
+                            //Add the user session cookie.
+                            Identity.LoginAdmin(AccessPanel);
+
+                            return Json(new { State = "Success", AccessPanel });
+                        }
+                        else
+                        {
+                            return Json(new { State = "ErrorPassword" });
+                        }
+                    }
+                }
+                else
+                {
+                    return Json(new { State = "Invalid" });
+                }
+            }
         }
         #endregion
     }

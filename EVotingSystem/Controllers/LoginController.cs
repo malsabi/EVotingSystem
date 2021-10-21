@@ -21,13 +21,11 @@ namespace EVotingSystem.Controllers
             Identity = new IdentityHandler(this);
         }
 
-
-
         #region "GET"
         [HttpGet]
         public IActionResult Index()
         {
-            if (Identity.IsStudentLoggedIn())
+            if (Identity.IsStudentLoggedIn() || Identity.IsAdminLoggedIn())
             {
                 return RedirectToAction("Index", "Home");
             }

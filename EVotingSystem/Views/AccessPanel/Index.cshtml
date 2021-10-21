@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <h1 class="text-uppercase text-center">Admin Dashboard Access Panel</h1>
 
-        <form class="mt-md-5" asp-controller="AccessPanel" asp-action="Index" method="post">
+        <form class="mt-md-5" asp-controller="AccessPanel" asp-action="Index" method="post" id="AccessPanelForm">
             <div class="form-group form-row justify-content-md-center">
                 <div class="col-md-4 mb-3">
                     <label asp-for="Email" for="AdminEmailTextBox">Email</label>
@@ -35,6 +35,9 @@
                         Access
                     </button>
                 </div>
+            </div>
+            <div class="form-row justify-content-center">
+                <p id="AccessPanelResult" class="text-danger"></p>
             </div>
         </form>
     </div>

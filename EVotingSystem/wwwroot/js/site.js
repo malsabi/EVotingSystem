@@ -400,3 +400,65 @@ $(document).ready(function ()
         });
     });
 });
+
+//Handle the Access Panel Button POST's request using AJAX
+$(document).ready(function ()
+{
+    $("#AccessPanelButton").on('click', e =>
+    {
+        e.preventDefault();
+        let AccessPanelResult = document.getElementById('AccessPanelResult');
+        AccessPanelResult.textContent = '';
+
+        $("#AccessPanelForm").validate();
+
+        if ($("#AccessPanelForm").valid())
+        {
+            ShowSpinner("AccessPanelButton", "Access");
+            $.ajax
+                ({
+                    type: "POST",
+                    url: 'AccessPanel?',
+                    data: $("#AccessPanelForm").serialize(),
+                    dataType: "json",
+                    success: function (response)
+                    {
+                        HideSpinner("AccessPanelButton", "Access");
+                        if (response != null)
+                        {
+                            console.log(response);
+
+                            if (response.state === 'Success')
+                            {
+                                AccessPanelResult.textContent = '';
+                                window.setTimeout(function ()
+                                {
+                                    Redirect('/', 500);
+                                }, 2500);
+                            }
+                            else if (response.state === 'ErrorPassword')
+                            {
+                                AccessPanelResult.textContent = 'Invalid Password, please enter a valid password.';
+                            }
+                            else if (response.state === 'ErrorActive')
+                            {
+                                AccessPanelResult.textContent = 'You are already signed in.';
+                            }
+                            else
+                            {
+                                AccessPanelResult.textContent = 'The Account is not registered.';
+                            }
+                        }
+                        else
+                        {
+                            AccessPanelResult.textContent = 'No response from the server.';
+                        }
+                    }
+                });
+        }
+        else
+        {
+            AccessPanelResult.textContent = 'Invalid data, please insert a valid data';
+        }
+    });
+});

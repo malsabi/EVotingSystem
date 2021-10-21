@@ -215,7 +215,147 @@ namespace EVotingSystem.Utilities
         #endregion
 
         #region "Admin Session Logout/Login"
+        public bool IsAdminLoggedIn(HttpRequest Request, HttpResponse Response)
+        {
+            if (Request.Cookies.ContainsKey(Config.AdminIdentityCookieName))
+            {
+                if (IsAdminSessionValid(Request))
+                {
+                    return true;
+                }
+                else
+                {
+                    LogoutAdmin(Request, Response);
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public bool IsAdminLoggedIn()
+        {
+            if (CookieHandler.ContainsCookie(Config.AdminIdentityCookieName))
+            {
+                if (IsAdminSessionValid())
+                {
+                    return true;
+                }
+                else
+                {
+                    LogoutAdmin();
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public bool IsAdminLoggedOut()
+        {
+            return CookieHandler.ContainsCookie(Config.AdminIdentityCookieName) == false;
+        }
+        public void LoginAdmin(AccessPanelModel AccessPanel)
+        {
+            DateTime Expires;
+            if (AccessPanel.StaySignedIn.Equals("true"))
+            {
+                //Persistant cookie that will stay for 30 days ~ 1 month.
+                //The admin will remain signed in for 30 days.
+                Expires = DateTime.Now.AddDays(30);
+            }
+            else
+            {
+                //Session cookie that will stay for only 1 day.
+                //The admin will logout after 1 day.
+                Expires = DateTime.Now.AddDays(1);
+            }
 
+            //Get the Admin model
+            AdminModel Admin = FireStore.GetAdmin(AccessPanel.Email).Result;
+
+            //Create Cookie value that will contain the login information encrypted by AES and serialized into JSON
+            string EncryptedJsonString = AES.Encrypt(JsonSerializer.Serialize(Admin), Config.Password);
+
+            //Register the identity cookie that will contain the encrypted json student model.
+            CookieHandler.RegisterCookie(Config.AdminIdentityCookieName, EncryptedJsonString, Expires);
+        }
+        public void LogoutAdmin(HttpRequest Request, HttpResponse Response)
+        {
+            if (Request.Cookies.ContainsKey(Config.AdminIdentityCookieName))
+            {
+                Response.Cookies.Delete(Config.AdminIdentityCookieName);
+            }
+        }
+        public void LogoutAdmin()
+        {
+            if (CookieHandler.ContainsCookie(Config.AdminIdentityCookieName))
+            {
+                CookieHandler.DeleteCookie(Config.AdminIdentityCookieName);
+            }
+        }
+        #endregion
+
+        #region "Admin Session"
+        public AdminModel AdminSession()
+        {
+            if (CookieHandler.ContainsCookie(Config.AdminIdentityCookieName))
+            {
+                string EncryptedJsonString = CookieHandler.GetCookieValue(Config.AdminIdentityCookieName);
+                try
+                {
+                    AdminModel Admin = JsonSerializer.Deserialize<AdminModel>(AES.Decrypt(EncryptedJsonString, Config.Password));
+                    return FireStore.GetAdmin(Admin.Email).Result;
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+            return null;
+        }
+        public bool IsAdminSessionValid()
+        {
+            if (CookieHandler.ContainsCookie(Config.AdminIdentityCookieName))
+            {
+                string EncryptedJsonString = CookieHandler.GetCookieValue(Config.AdminIdentityCookieName);
+                try
+                {
+                    AdminModel Admin = JsonSerializer.Deserialize<AdminModel>(AES.Decrypt(EncryptedJsonString, Config.Password));
+                    return FireStore.IsAdminRegistered(Admin.Email).Result && FireStore.IsAdminOnline(Admin.Email).Result;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        private bool IsAdminSessionValid(HttpRequest request)
+        {
+            if (request.Cookies.ContainsKey(Config.AdminIdentityCookieName))
+            {
+                string EncryptedJsonString = request.Cookies[Config.AdminIdentityCookieName];
+                try
+                {
+                    AdminModel Admin = JsonSerializer.Deserialize<AdminModel>(AES.Decrypt(EncryptedJsonString, Config.Password));
+                    return FireStore.IsAdminRegistered(Admin.Email).Result && FireStore.IsAdminOnline(Admin.Email).Result;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
         #endregion
 
         #region "Confirmation Code / OTP"
@@ -244,7 +384,6 @@ namespace EVotingSystem.Utilities
             }
         }
         #endregion
-
         #endregion
 
         #region "Static Methods"

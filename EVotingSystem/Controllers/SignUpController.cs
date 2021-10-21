@@ -24,8 +24,7 @@ namespace EVotingSystem.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            //Check if the cookie exists there, if so and (signed in), change the view.
-            if (Identity.IsStudentLoggedIn())
+            if (Identity.IsStudentLoggedIn() || Identity.IsAdminLoggedIn())
             {
                 return RedirectToAction("Index", "Home");
             }

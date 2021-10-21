@@ -11,6 +11,12 @@ namespace EVotingSystem.DataBase
     /// A class that is responsible for handling GET/SET/UPDATE/REMOVE in the fire store database.
     /// A class that provides some useful functions for Signing-In/Signing-Out/Registering.
     /// A class that provides some useful functions for Candidate Insertion/Update/Remove.
+    /// A class that provides some useful functions for Admin to control of the candidates/students,
+    ///   and manage to have statistical information of the total votings from each candidate.
+    /// FEATURES::
+    /// 1. Real time update for any changes on the student fields -> also cookie session is updated.
+    /// 2. All of the data is encrypted by AES and Custom Encoder in server side before posting to DB.
+    /// 3. Fully Serialized using Google Protobuff.
     /// </summary>
     public class FireStoreManager
     {
@@ -96,9 +102,6 @@ namespace EVotingSystem.DataBase
             {
             }
         }
-
-    
-
         /// <summary>
         /// Gets the Student Information from the database
         /// </summary>
@@ -196,7 +199,7 @@ namespace EVotingSystem.DataBase
                 Dictionary<string, object> Fields = new Dictionary<string, object>
                 {
                     { "Status", Config.StudentOffline },
-                    { "StaySignedIn", "false" }
+                    { "StaySignedIn", Config.StudentStayOffline }
                 };
                 await Document.UpdateAsync(Fields);
             }
@@ -246,6 +249,7 @@ namespace EVotingSystem.DataBase
             }
         }
         #endregion
+
         #region "Candidate"
         /// <summary>
         /// Adds the candidate into the database
@@ -389,6 +393,7 @@ namespace EVotingSystem.DataBase
             }
         }
         #endregion
+
         #region "CandidateVote"
         /// <summary>
         /// Gets the candidate vote model from the CandidateVote Entity by the Id
@@ -426,7 +431,128 @@ namespace EVotingSystem.DataBase
             return await Document.SetAsync(CandidateVote, SetOptions.Overwrite);
         }
         #endregion
-        #region "AccessPanel / Dashboard"
+
+        #region "Admin"
+        /// <summary>
+        /// Registers the admin into the database.
+        /// </summary>
+        /// <param name="Admin">Represents the Admin Model</param>
+        public async void RegisterAdmin(AdminModel Admin)
+        {
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.AdminPath).Document(Admin.Email);
+                await Document.SetAsync(Admin, SetOptions.Overwrite);
+            }
+            catch
+            {
+            }
+        }
+        /// <summary>
+        /// Gets the Admin Information from the database
+        /// </summary>
+        /// <param name="Email">Represents the admin email address</param>
+        /// <returns>Returns the admin if registered in the database otherwise null</returns>
+        public async Task<AdminModel> GetAdmin(string Email)
+        {
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.AdminPath).Document(Email);
+                DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
+                if (SnapShot.Exists)
+                {
+                    return SnapShot.ConvertTo<AdminModel>();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        /// <summary>
+        /// Checks if the admin is registered in the database or not
+        /// </summary>
+        /// <param name="Email">Represents the admin email address</param>
+        /// <returns>Returns true if the admin is registered in the database otherwise false.</returns>
+        public async Task<bool> IsAdminRegistered(string Email)
+        {
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.AdminPath).Document(Email);
+                DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
+                return SnapShot.Exists;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        /// <summary>
+        /// Checks if the admin is active and loggedin in the database
+        /// </summary>
+        /// <param name="Email">Represents the admin email address</param>
+        /// <returns>Returns true if the admin is online in the database otherwise false</returns>
+        public async Task<bool> IsAdminOnline(string Email)
+        {
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.AdminPath).Document(Email);
+                DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
+                if (SnapShot.Exists)
+                {
+                    return SnapShot.GetValue<string>("Status").Equals(Config.AdminOnline);
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Changes the status of the admin to online, and updates the StaySignedIn depending on the user.
+        /// </summary>
+        /// <param name="AccessPanel">Represents the access panel model</param>
+        public async void LoginAdmin(AccessPanelModel AccessPanel)
+        {
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.AdminPath).Document(AccessPanel.Email);
+                Dictionary<string, object> Fields = new Dictionary<string, object>
+                {
+                    { "Status", Config.AdminOnline },
+                    { "StaySignedIn", AccessPanel.StaySignedIn }
+                };
+                await Document.UpdateAsync(Fields);
+            }
+            catch
+            {
+            }
+        }
+        /// <summary>
+        /// Changes the status of the admin to Offline, and updates the StaySignedIn to false.
+        /// </summary>
+        /// <param name="AccessPanel">Represents the access panel model</param>
+        public async void LogoutAdmin(AdminModel Admin)
+        {
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.AdminPath).Document(Admin.Email);
+                Dictionary<string, object> Fields = new Dictionary<string, object>
+                {
+                    { "Status", Config.AdminOffline },
+                    { "StaySignedIn", Config.AdminStayOffline }
+                };
+                await Document.UpdateAsync(Fields);
+            }
+            catch
+            {
+            }
+        }
         #endregion
         #endregion
     }

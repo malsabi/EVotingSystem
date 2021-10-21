@@ -20,7 +20,7 @@
                         Student Council
                         <br />
                         Secure E-Voting System
-             
+
                     </div>
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,15 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="AboutUs" asp-action="Index">ABOUT US</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Candidates" asp-action="Index">CANDIDATES LIST</a>
+                            @if (new IdentityHandler().IsAdminLoggedIn(HttpContextAccessor.HttpContext.Request, HttpContextAccessor.HttpContext.Response))
+                            {
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Dashboard" asp-action="Index">DASHBOARD</a>
+                            }
+                            else
+                            {
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Candidates" asp-action="Index">CANDIDATES LIST</a>
+                            }
+
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Contact" asp-action="Index">CONTACT</a>
@@ -46,6 +54,10 @@
                             @if (new IdentityHandler().IsStudentLoggedIn(HttpContextAccessor.HttpContext.Request, HttpContextAccessor.HttpContext.Response))
                             {
                                 <button class="btn btn-outline-primary btn-lg" style="border-radius: 40px;" asp-area="" asp-controller="Profile" asp-action="Index">My Profile</button>
+                                <button class="btn btn-primary btn-lg ml-md-2" style="border-radius: 40px;" asp-area="" asp-controller="Home" asp-action="Logout">LOGOUT</button>
+                            }
+                            else if (new IdentityHandler().IsAdminLoggedIn(HttpContextAccessor.HttpContext.Request, HttpContextAccessor.HttpContext.Response))
+                            {
                                 <button class="btn btn-primary btn-lg ml-md-2" style="border-radius: 40px;" asp-area="" asp-controller="Home" asp-action="Logout">LOGOUT</button>
                             }
                             else

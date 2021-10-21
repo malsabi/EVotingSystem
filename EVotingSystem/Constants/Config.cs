@@ -41,6 +41,16 @@
         public static readonly string StudentOffline = "Offline";
 
         /// <summary>
+        /// Represents if the student should stay signed in
+        /// </summary>
+        public static readonly string StudentStayOnline = "true";
+
+        /// <summary>
+        /// Represents if the studnet should not stay signed in
+        /// </summary>
+        public static readonly string StudentStayOffline = "false";
+
+        /// <summary>
         /// Represents the path of the students in the firestore
         /// </summary>
         public static readonly string StudentPath = "STUDENTS";
@@ -69,6 +79,16 @@
         /// Represents the status of the admin in case offline
         /// </summary>
         public static readonly string AdminOffline = "Offline";
+
+        /// <summary>
+        /// Represents if the admin should stay signed in
+        /// </summary>
+        public static readonly string AdminStayOnline = "true";
+
+        /// <summary>
+        /// Represents if the admin should not stay signed in
+        /// </summary>
+        public static readonly string AdminStayOffline = "false";
         #endregion
 
         #region "AES Constants"
