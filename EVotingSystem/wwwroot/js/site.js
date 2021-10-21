@@ -200,6 +200,18 @@ $(document).ready(function ()
     HideModal('#ConfirmationModal');
 });
 
+//When the document (page) is ready and loaded, it will do the following:
+//1. Handle the Vote button click
+//2. If the user clicks "YES" it will attempt the vote, otherwise it will just close the modal.
+$(document).ready(function ()
+{
+    $("#VoteButton").on('click', e =>
+    {
+        console.log("VoteButton Clicked");
+        $('#VoteConfirmationModal').modal('show');
+    });
+});
+
 //Handle the Sign Up Register Button POST's request using AJAX
 $(document).ready(function ()
 {

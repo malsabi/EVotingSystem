@@ -1,4 +1,6 @@
-﻿using EVotingSystem.Validation;
+﻿using EVotingSystem.Cryptography;
+using EVotingSystem.Helpers;
+using EVotingSystem.Validation;
 using Google.Cloud.Firestore;
 using System.ComponentModel.DataAnnotations;
 
@@ -51,6 +53,21 @@ namespace EVotingSystem.Models
         [MaxLength(15, ErrorMessage = "Phone number cannot exceed more than 10 digits")]
         public string Phone { get; set; }
 
+        [FirestoreProperty]
+        [Required(ErrorMessage = "Please insert your gender")]
+        [MaxLength(6, ErrorMessage = "gender cannot exceed more than 6 letters")]
+        public string Gender { get; set; }
+
         public string Code { get; set; }
+
+        public void EncryptProperties()
+        {
+            this.StudentId = FirestoreEncoder.EncodeForFirebaseKey(CandidateHelper.EncryptField(this.StudentId));
+        }
+
+        public void DecryptProperties()
+        {
+            this.StudentId = FirestoreEncoder.DecodeFromFirebaseKey(CandidateHelper.DecryptField(this.StudentId));
+        }
     }
 }

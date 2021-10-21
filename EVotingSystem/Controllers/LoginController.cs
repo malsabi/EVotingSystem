@@ -27,7 +27,7 @@ namespace EVotingSystem.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            if (Identity.IsUserLoggedIn())
+            if (Identity.IsStudentLoggedIn())
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -39,7 +39,7 @@ namespace EVotingSystem.Controllers
         [HttpGet]
         public IActionResult Recover()
         {
-            if (Identity.IsUserLoggedIn())
+            if (Identity.IsStudentLoggedIn())
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -54,7 +54,9 @@ namespace EVotingSystem.Controllers
         [HttpPost] 
         public IActionResult Index(LoginModel Login)
         {
-            if (Identity.IsUserLoggedIn())
+            Login.EncryptProperties();
+
+            if (Identity.IsStudentLoggedIn())
             {
                 return RedirectToPage("Index", "Home");
             }
@@ -76,6 +78,8 @@ namespace EVotingSystem.Controllers
 
                         if (Student.Password.Equals(Login.Password))
                         {
+                            Student.DecryptProperties();
+
                             string ConfirmationCode = DeviceHelper.GetVerificationCode(Config.ConfirmCodeLength);
 
                             VerificationHelper.SendCode(Student.FirstName, Student.LastName, Student.Email, ConfirmationCode);
@@ -100,7 +104,9 @@ namespace EVotingSystem.Controllers
         [HttpPost]
         public IActionResult Check(LoginModel Login)
         {
-            if (Identity.IsUserLoggedIn())
+            Login.EncryptProperties();
+
+            if (Identity.IsStudentLoggedIn())
             {
                 return RedirectToPage("Index", "Home");
             }
@@ -118,7 +124,7 @@ namespace EVotingSystem.Controllers
                         Identity.DeleteConfirmationCode();
 
                         //Add the user session cookie.
-                        Identity.LogIn(Login);
+                        Identity.LoginStudent(Login);
                         
                         return Json(new { State = "Success", Login });
                     }
@@ -137,7 +143,7 @@ namespace EVotingSystem.Controllers
         [HttpPost]
         public IActionResult Recover(RecoverModel model)
         {
-            if (Identity.IsUserLoggedIn())
+            if (Identity.IsStudentLoggedIn())
             {
                 return RedirectToPage("Index", "Home");
             }

@@ -8,40 +8,35 @@
 }
 <div class="jumbotron rounded-lg" style="min-height: 65vh">
     <div class="container-fluid">
+        <h1 class="text-uppercase text-center">CANDIDATES</h1>
+        <h5 class="text-uppercase text-center text-muted mb-md-5">Student Council 2021</h5>
         <div class="card-columns">
-            @{ StudentModel Student = IdentityHandler.StudentSession(HttpContextAccessor.HttpContext.Request); }
+            @{ StudentModel Student = IdentityHandler.StudentSession(HttpContextAccessor.HttpContext.Request);}
             @foreach (CandidateModel CM in Model)
             {
                 <form class="" asp-controller="Candidates" asp-action="Index" asp-route-id="@CM.Id" method="post">
-                    <div class="card">
-                       
-                        @(new HtmlString(@CandidateHelper.GetCandidateHtmlImage(CM.Image)));
-                        <div class="card-body">
-                            <h6 class="card-title">@CM.Name</h6>
+                    <div class="card border-primary text-dark">
+                        <div class="card-header">
                             <h5 class="card-title">@CM.Id</h5>
-                            <a class="btn btn-primary btn-block text-white" data-toggle="collapse" data-target="#@("Collapse" + CM.Id)" aria-expanded="false" aria-controls="@("Collapse" + CM.Id)">More Information</a>
-
-                            @if (Student != null && Student.SentVotes != null && Student.SentVotes.Any(c => c.Id == CM.Id))
+                        </div>
+                        <div class="card-body">
+                            @(new HtmlString(@CandidateHelper.GetCandidateHtmlImage("100%", "200px", CM.Image)))
+                            <h6 class="card-title pt-md-3">@CM.Name</h6>
+                            @if (CandidateHandler.IsCandidateVoted(CM, Student))
                             {
-                                <button class="btn btn-danger btn-block mt-md-2" type="submit">
-                                    Unvote
+                                <button class="btn btn-secondary btn-block mt-md-2 disabled" type="button">
+                                    Voted
                                 </button>
                             }
                             else
                             {
                                 <button class="btn btn-primary btn-block mt-md-2" type="submit">
-                                    Vote
+                                    For more information
                                 </button>
                             }
                         </div>
                         <div class="card-footer">
                             <small class="text-muted">Last active vote @CM.LastVoteReceived</small>
-                        </div>
-                        <div class="collapse" id="@("Collapse" + CM.Id)">
-                            <div class="card card-body">
-                                <p>Total Votes: @CM.TotalVotes</p>
-                                <p>Speach: @CM.Speach</p>
-                            </div>
                         </div>
                     </div>
                 </form>
@@ -49,6 +44,18 @@
         </div>
     </div>
 </div>
+@*@if (Student != null && Student.SentVotes != null && Student.SentVotes.Any(c => c.Id == CM.Id))
+{
+    <button class="btn btn-secondary btn-block mt-md-2 disabled" type="button">
+        Voted
+    </button>
+}
+else
+{
+    <button class="btn btn-primary btn-block mt-md-2" type="submit">
+        For more information
+    </button>
+}*@
 @*<form class="mt-md-5" asp-controller="Candidates" asp-action="Index" method="post">
         <div class="form-group form-row justify-content-md-center">
             <div class="col-md-4 mb-3">

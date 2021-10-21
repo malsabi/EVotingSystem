@@ -1,7 +1,9 @@
 ﻿using EVotingSystem.DataBase;
+using EVotingSystem.Helpers;
 using EVotingSystem.Models;
 using EVotingSystem.Utilities;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace EVotingSystem.Controllers
 {
@@ -24,8 +26,12 @@ namespace EVotingSystem.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            //Get the updated candidates from the database.
-            return View(FireStore.GetAllCandidates().Result.ToArray());
+            List<CandidateModel> Candidates = FireStore.GetAllCandidates().Result;
+            foreach (CandidateModel C in Candidates)
+            {
+                C.DecryptProperties();
+            }
+            return View(Candidates.ToArray());
         }
         #endregion
 
@@ -33,10 +39,12 @@ namespace EVotingSystem.Controllers
         [HttpPost]
         public IActionResult Index(string Id)
         {
-            if (Identity.IsUserLoggedIn())
+            if (Identity.IsStudentLoggedIn())
             {
                 //Get the candidate from the Id
-                CandidateModel Candidate = FireStore.GetCandidate(Id).Result;
+                CandidateModel Candidate = FireStore.GetCandidate(CandidateHelper.EncryptField(Id)).Result;
+                //Decrypt the candidate fields to show them for the student.
+                Candidate.DecryptProperties();
                 //Pass the specified candidate to the vote view.
                 return View("Vote", Candidate);
             }
@@ -50,8 +58,17 @@ namespace EVotingSystem.Controllers
         [HttpPost]
         public IActionResult Attempt(CandidateModel Candidate)
         {
+            //string[] Elements = Request.Form[Candidate.Id].ToArray();
+
             //Handle Voting/UnVoting
-            this.Candidate.ApplyVote(Identity.StudentSession(), Candidate);
+            if (this.Candidate.ApplyVote(Identity.StudentSession(), Candidate))
+            {
+                //Handle Success-Popup Message
+            }
+            else
+            {
+                //Handle Error-Popup Message
+            }
             //Redirect to the candidate view after handling the voting/unvoting.
             return RedirectToAction("Index", "Candidates");
         }

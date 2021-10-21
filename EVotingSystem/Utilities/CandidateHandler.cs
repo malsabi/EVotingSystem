@@ -1,4 +1,5 @@
-﻿using EVotingSystem.DataBase;
+﻿using EVotingSystem.Constants;
+using EVotingSystem.DataBase;
 using EVotingSystem.Models;
 using System;
 using System.Collections.Generic;
@@ -26,46 +27,122 @@ namespace EVotingSystem.Utilities
         #endregion
 
         #region "Public Methods"
-        public void ApplyVote(StudentModel Student, CandidateModel Candidate)
+        public bool ApplyVote(StudentModel Student, CandidateModel Candidate)
         {
-            if (Student.SentVotes == null)
+            Student.DecryptProperties();
+            Candidate.EncryptProperties();
+
+            if (int.Parse(Student.TotalVotesApplied) >= Config.MaximumStudentVotes)
             {
-                Student.SentVotes = new List<CandidateModel>
-                {
-                    Candidate
-                };
-                Student.TotalVotesApplied = "1";
-
-                Candidate.TotalVotes = "1";
-                Candidate.LastVoteReceived = GetVoteTimeStamp();
-
-                FireStore.UpdateStudent(Student).Wait();
-                FireStore.UpdateCandidate(Candidate).Wait();
+                return false;
             }
             else
             {
-                if (Student.SentVotes.Any(c => c.Id == Candidate.Id)) //Unvote Operation
+                StudentVoteModel StudentVote = new StudentVoteModel()
                 {
-                    Student.SentVotes.RemoveAll(c => c.Id == Candidate.Id);
-                    Student.TotalVotesApplied = (int.Parse(Student.TotalVotesApplied) - 1).ToString();
+                    Id = Student.StudentId,
+                    Gender = Student.Gender
+                };
+                StudentVote.EncryptProperties();
 
-                    Candidate.TotalVotes = (int.Parse(Candidate.TotalVotes) - 1).ToString();
-                    Candidate.LastVoteReceived = GetVoteTimeStamp();
+                //Increment the total votes the user has applied, the maximum is 2 votes for each student
+                Student.TotalVotesApplied = (int.Parse(Student.TotalVotesApplied) + 1).ToString();
 
-                    FireStore.UpdateStudent(Student).Wait();
-                    FireStore.UpdateCandidate(Candidate).Wait();
-                }
-                else //Vote Operation
+                //Extract the candidate to be voted on, from the CandidateVote Entity.
+                CandidateVoteModel CandidateVote = FireStore.GetCandidateVote(Candidate.Id).Result;
+             
+                if (CandidateVote == null)
                 {
-                    Student.SentVotes.Add(Candidate);
-                    Student.TotalVotesApplied = (int.Parse(Student.TotalVotesApplied) + 1).ToString();
-
-                    Candidate.TotalVotes = (int.Parse(Candidate.TotalVotes) + 1).ToString();
-                    Candidate.LastVoteReceived = GetVoteTimeStamp();
-
-                    FireStore.UpdateStudent(Student).Wait();
-                    FireStore.UpdateCandidate(Candidate).Wait();
+                    return false;
                 }
+                else
+                {
+                    //Initialize the StudentVote list, it is null if it was the first vote for the candidate.
+                    if (CandidateVote.StudentVoteCollection == null)
+                    {
+                        //Decrypt the candidate vote
+                        CandidateVote.DecryptProperties();
+                        //Initialize the StudentVote collection
+                        CandidateVote.StudentVoteCollection = new List<StudentVoteModel>();
+                        //Apply vote by incrementing the total votes and adding the student who applied the vote.
+                        CandidateVote.TotalVotes = (int.Parse(CandidateVote.TotalVotes) + 1).ToString();
+                        CandidateVote.StudentVoteCollection.Add(StudentVote);
+                        //Encrypt the candidate vote back again after finishing from editing.
+                        CandidateVote.EncryptProperties();
+                        //Update the Last Vote Received for the candidate.
+                        Candidate.LastVoteReceived = DateTime.Now.ToLongDateString().ToString();
+                    }
+                    else
+                    {
+                        //Prevent the student to vote to the same candidate twice.
+                        if (CandidateVote.StudentVoteCollection.Any(sv => sv.Id.Equals(StudentVote.Id)))
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            //Decrypt the candidate vote to edit the fields
+                            CandidateVote.DecryptProperties();
+                            //Apply vote by incrementing the total votes and adding the student who applied the vote.
+                            CandidateVote.TotalVotes = (int.Parse(CandidateVote.TotalVotes) + 1).ToString();
+                            CandidateVote.StudentVoteCollection.Add(StudentVote);
+                            //Encrypt the candidate vote back again after finishing from editing.
+                            CandidateVote.EncryptProperties();
+                            //Update the Last Vote Received for the candidate.
+                            Candidate.LastVoteReceived = DateTime.Now.ToLongDateString().ToString();
+                        }
+                    }
+
+                    //Encrypt the student back
+                    Student.EncryptProperties();
+                    //Update Student Entity
+                    FireStore.UpdateStudent(Student).Wait();
+                    //Update Candidate Entity
+                    FireStore.UpdateCandidate(Candidate).Wait();
+                    //Update CandidateVote Entity
+                    FireStore.UpdateCandidateVote(CandidateVote).Wait();
+
+                    return true;
+                }
+            }
+        }
+        #endregion
+
+        #region "Static Methods"
+        public static List<CandidateModel> GetStudentCandidateVotes(StudentModel Student)
+        {
+            FireStoreManager FireStore = new FireStoreManager();
+            List<CandidateModel> Candidates = FireStore.GetAllCandidates().Result;
+            List<CandidateModel> StudentCanddiateVotes = new List<CandidateModel>();
+            foreach (CandidateModel Candidate in Candidates)
+            {
+                CandidateVoteModel CandidateVote = FireStore.GetCandidateVote(Candidate.Id).Result;
+                if (CandidateVote.StudentVoteCollection != null)
+                {
+                    if (CandidateVote.StudentVoteCollection.Any(cv => cv.Id.Equals(Student.StudentId)))
+                    {
+                        StudentCanddiateVotes.Add(Candidate);
+                    }
+                }
+            }
+            return StudentCanddiateVotes;
+        }
+        public static bool IsCandidateVoted(CandidateModel Candidate, StudentModel Student)
+        {
+            Candidate.EncryptProperties();
+            CandidateVoteModel CandidateVote = new FireStoreManager().GetCandidateVote(Candidate.Id).Result;
+            Candidate.DecryptProperties();
+            if (CandidateVote.StudentVoteCollection == null)
+            {
+                return false;
+            }
+            else
+            {
+                if (CandidateVote.StudentVoteCollection.Any(cv => cv.Id.Equals(Student.StudentId)))
+                {
+                    return true;
+                }
+                return false;
             }
         }
         #endregion

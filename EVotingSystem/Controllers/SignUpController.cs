@@ -25,7 +25,7 @@ namespace EVotingSystem.Controllers
         public IActionResult Index()
         {
             //Check if the cookie exists there, if so and (signed in), change the view.
-            if (Identity.IsUserLoggedIn())
+            if (Identity.IsStudentLoggedIn())
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -38,7 +38,7 @@ namespace EVotingSystem.Controllers
         public IActionResult Successful()
         {
             //Check if the cookie exists there, if so and (signed in), change the view.
-            if (Identity.IsUserLoggedIn())
+            if (Identity.IsStudentLoggedIn())
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -51,9 +51,11 @@ namespace EVotingSystem.Controllers
 
         #region "POST"
         [HttpPost]
-        public IActionResult Index(SignUpModel model)
+        public IActionResult Index(SignUpModel SignUp)
         {
-            if (Identity.IsUserLoggedIn())
+            SignUp.EncryptProperties();
+
+            if (Identity.IsStudentLoggedIn())
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -61,14 +63,14 @@ namespace EVotingSystem.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    if (FireStore.IsStudentRegistered(model.StudentId).Result)
+                    if (FireStore.IsStudentRegistered(SignUp.StudentId).Result)
                     {
                         return Json(new { State = "Error" });
                     }
                     else
                     {
                         string ConfirmCode = DeviceHelper.GetVerificationCode(Config.ConfirmCodeLength);
-                        VerificationHelper.SendCode(model.FirstName, model.LastName, model.Email, ConfirmCode);
+                        VerificationHelper.SendCode(SignUp.FirstName, SignUp.LastName, SignUp.Email, ConfirmCode);
                         Identity.SetConfirmationCode(ConfirmCode);
                         return Json(new { State = "Valid", ConfirmCode });
                     }
@@ -82,7 +84,7 @@ namespace EVotingSystem.Controllers
         [HttpPost]
         public IActionResult Check(SignUpModel model)
         {
-            if (Identity.IsUserLoggedIn())
+            if (Identity.IsStudentLoggedIn())
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -102,12 +104,14 @@ namespace EVotingSystem.Controllers
                             Email = model.Email,
                             Password = model.Password,
                             Phone = model.Phone,
+                            Gender = model.Gender,
                             Status = "Offline",
                             StaySignedIn = "false",
                             ExpiryDate = System.DateTime.UtcNow,
-                            TotalVotesApplied = "0",
-                            SentVotes = null
+                            TotalVotesApplied = "0"
                         };
+                        Student.EncryptProperties();
+
                         FireStore.RegisterStudent(Student);
                         Identity.DeleteConfirmationCode();
 

@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Html;
 @using EVotingSystem.Helpers;
 @using EVotingSystem.Utilities;
+@using EVotingSystem.Constants;
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @model CandidateModel
 @{
@@ -10,34 +11,65 @@
     <div class="container-fluid">
         <form class="" asp-controller="Candidates" asp-action="Attempt" method="post">
             @{ StudentModel Student = IdentityHandler.StudentSession(HttpContextAccessor.HttpContext.Request); }
-            <div class="card pt-4 text-center">
-                @(new HtmlString(@CandidateHelper.GetCandidateHtmlImage("25%", "25%", Model.Image, true)));
+            <div class="card border-primary text-dark">
+                <div class="card-header">
+                    <h5 class="card-title">@Model.Id</h5>
+                </div>
+                <div class="d-flex align-items-center pt-md-3 pb-md-3">
+                    @(new HtmlString(@CandidateHelper.GetCandidateHtmlImage("50%", "100%", Model.Image, true)))
+                </div>
                 <div class="card-body">
                     <h6 class="card-title">@Model.Name</h6>
-                    <h5 class="card-title">@Model.Id</h5>
-                    <a class="btn btn-primary btn-block text-white" data-toggle="collapse" data-target="#@("Collapse" + Model.Id)" aria-expanded="false" aria-controls="@("Collapse" + Model.Id)">More Information</a>
-
-                    @if (Student != null && Student.SentVotes != null && Student.SentVotes.Any(c => c.Id == Model.Id))
+                    <div class="border border-info p-md-3">
+                        <p class="card-text">Candidate Speach</p>
+                        <p class="card-text">@Model.Speach</p>
+                    </div>
+                    <button class="btn btn-primary btn-block mt-md-2" id="VoteButton" type="button">
+                        Vote
+                    </button>
+                </div>
+            </div>
+            <div class="modal fade" id="VoteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="VoteConfirmationModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm" role="document">
+                    @{ Student.DecryptProperties(); }
+                    @if (int.Parse(Student.TotalVotesApplied) >= Config.MaximumStudentVotes)
                     {
-                        <button class="btn btn-danger btn-block mt-md-2" type="submit">
-                            Unvote
-                        </button>
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="VoteConfirmationModalLabel">Vote Limit Reached</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>You have reached the limit, you are only allowed to vote for 2 candidates</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-lg btn-block" data-dismiss="modal">Ok</button>
+                            </div>
+                        </div>
                     }
                     else
                     {
-                        <button class="btn btn-primary btn-block mt-md-2" type="submit">
-                            Vote
-                        </button>
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="VoteConfirmationModalLabel">Vote Confirmation</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to vote to this candidate?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">No</button>
+                                <button id="VoteButton" type="submit" class="btn btn-primary btn-lg d-block">
+                                    Yes
+                                </button>
+                            </div>
+                        </div>
                     }
-                </div>
-                <div class="card-footer">
-                    <small class="text-muted">Last active vote @Model.LastVoteReceived</small>
-                </div>
-                <div class="collapse" id="@("Collapse" + Model.Id)">
-                    <div class="card card-body">
-                        <p>Total Votes: @Model.TotalVotes</p>
-                        <p>Speach: @Model.Speach</p>
-                    </div>
+                    @{ Student.EncryptProperties(); }
                 </div>
             </div>
             @Html.HiddenFor(x => x.Name)
@@ -45,7 +77,6 @@
             @Html.HiddenFor(x => x.Id)
             @Html.HiddenFor(x => x.Speach)
             @Html.HiddenFor(x => x.Image)
-            @Html.HiddenFor(x => x.TotalVotes)
             @Html.HiddenFor(x => x.LastVoteReceived)
         </form>
     </div>

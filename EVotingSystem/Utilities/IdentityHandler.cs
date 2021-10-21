@@ -16,7 +16,6 @@ namespace EVotingSystem.Utilities
         private readonly FireStoreManager FireStore;
         #endregion
 
-
         #region "Constructor"
         public IdentityHandler()
         {
@@ -34,17 +33,16 @@ namespace EVotingSystem.Utilities
         #region "Handlers"
         private void FireStoreOnStudentFieldsUpdated(StudentModel Student)
         {
-            if (CookieHandler.ContainsCookie(Config.IdentityCookieName))
+            if (CookieHandler.ContainsCookie(Config.StudentIdentityCookieName))
             {
                 //Create Cookie value that will contain the login information encrypted by AES and serialized into JSON
                 string EncryptedJsonString = AES.Encrypt(JsonSerializer.Serialize(Student), Config.Password);
 
                 //Register the identity cookie that will contain the encrypted json student model.
-                CookieHandler.RegisterCookie(Config.IdentityCookieName, EncryptedJsonString, Student.ExpiryDate);
+                CookieHandler.RegisterCookie(Config.StudentIdentityCookieName, EncryptedJsonString, Student.ExpiryDate);
             }
         }
         #endregion
-
 
         #region "Private Methods"
         public void HandleStudentListener()
@@ -58,11 +56,11 @@ namespace EVotingSystem.Utilities
         }
         #endregion
 
-
         #region "Public Methods"
-        public bool IsUserLoggedIn(HttpRequest Request)
+        #region "Student Session Logout/Login"
+        public bool IsStudentLoggedIn(HttpRequest Request, HttpResponse Response)
         {
-            if (Request.Cookies.ContainsKey(Config.IdentityCookieName))
+            if (Request.Cookies.ContainsKey(Config.StudentIdentityCookieName))
             {
                 if (IsStudentSessionValid(Request))
                 {
@@ -70,7 +68,7 @@ namespace EVotingSystem.Utilities
                 }
                 else
                 {
-                    LogOut();
+                    LogoutStudent(Request, Response);
                     return false;
                 }
             }
@@ -79,10 +77,9 @@ namespace EVotingSystem.Utilities
                 return false;
             }
         }
-
-        public bool IsUserLoggedIn()
+        public bool IsStudentLoggedIn()
         {
-            if (CookieHandler.ContainsCookie(Config.IdentityCookieName))
+            if (CookieHandler.ContainsCookie(Config.StudentIdentityCookieName))
             {
                 if (IsStudentSessionValid())
                 {
@@ -90,7 +87,7 @@ namespace EVotingSystem.Utilities
                 }
                 else
                 {
-                    LogOut();
+                    LogoutStudent();
                     return false;
                 }
             }
@@ -99,13 +96,11 @@ namespace EVotingSystem.Utilities
                 return false;
             }
         }
-
-        public bool IsUserLoggedOut()
+        public bool IsStudentLoggedOut()
         {
-            return CookieHandler.ContainsCookie(Config.IdentityCookieName) == false;
+            return CookieHandler.ContainsCookie(Config.StudentIdentityCookieName) == false;
         }
-
-        public void LogIn(LoginModel Login)
+        public void LoginStudent(LoginModel Login)
         {
             DateTime Expires;
             if (Login.StaySignedIn.Equals("true"))
@@ -131,83 +126,82 @@ namespace EVotingSystem.Utilities
             string EncryptedJsonString = AES.Encrypt(JsonSerializer.Serialize(Student), Config.Password);
 
             //Register the identity cookie that will contain the encrypted json student model.
-            CookieHandler.RegisterCookie(Config.IdentityCookieName, EncryptedJsonString, Expires);            
+            CookieHandler.RegisterCookie(Config.StudentIdentityCookieName, EncryptedJsonString, Expires);
         }
-
-        public void LogOut()
+        public void LogoutStudent(HttpRequest Request, HttpResponse Response)
         {
-            if (CookieHandler.ContainsCookie(Config.IdentityCookieName))
+            if (Request.Cookies.ContainsKey(Config.StudentIdentityCookieName))
             {
-                CookieHandler.DeleteCookie(Config.IdentityCookieName);
+                Response.Cookies.Delete(Config.StudentIdentityCookieName);
             }
         }
+        public void LogoutStudent()
+        {
+            if (CookieHandler.ContainsCookie(Config.StudentIdentityCookieName))
+            {
+                CookieHandler.DeleteCookie(Config.StudentIdentityCookieName);
+            }
+        }
+        #endregion
 
+        #region "Student Session"
         public StudentModel StudentSession()
         {
-            if (CookieHandler.ContainsCookie(Config.IdentityCookieName))
+            if (CookieHandler.ContainsCookie(Config.StudentIdentityCookieName))
             {
-                string EncryptedJsonString = CookieHandler.GetCookieValue(Config.IdentityCookieName);
-                StudentModel Student = JsonSerializer.Deserialize<StudentModel>(AES.Decrypt(EncryptedJsonString, Config.Password));
-                return FireStore.GetStudent(Student.StudentId).Result;
+                string EncryptedJsonString = CookieHandler.GetCookieValue(Config.StudentIdentityCookieName);
+                try
+                {
+                    StudentModel Student = JsonSerializer.Deserialize<StudentModel>(AES.Decrypt(EncryptedJsonString, Config.Password));
+                    return FireStore.GetStudent(Student.StudentId).Result;
+                }
+                catch
+                {
+                    return null;
+                }
             }
             return null;
         }
-
         public bool IsStudentSessionValid()
         {
-            if (CookieHandler.ContainsCookie(Config.IdentityCookieName))
+            if (CookieHandler.ContainsCookie(Config.StudentIdentityCookieName))
             {
-                string EncryptedJsonString = CookieHandler.GetCookieValue(Config.IdentityCookieName);
-                StudentModel Student = JsonSerializer.Deserialize<StudentModel>(AES.Decrypt(EncryptedJsonString, Config.Password));
-                return FireStore.IsStudentRegistered(Student.StudentId).Result;
+                string EncryptedJsonString = CookieHandler.GetCookieValue(Config.StudentIdentityCookieName);
+                try
+                {
+                    StudentModel Student = JsonSerializer.Deserialize<StudentModel>(AES.Decrypt(EncryptedJsonString, Config.Password));
+                    return FireStore.IsStudentRegistered(Student.StudentId).Result && FireStore.IsStudentOnline(Student.StudentId).Result;
+                }
+                catch
+                {
+                    return false;
+                }
             }
             else
             {
                 return false;
             }
         }
-
         private bool IsStudentSessionValid(HttpRequest request)
         {
-            if (request.Cookies.ContainsKey(Config.IdentityCookieName))
+            if (request.Cookies.ContainsKey(Config.StudentIdentityCookieName))
             {
-                string EncryptedJsonString = request.Cookies[Config.IdentityCookieName];
-                StudentModel Student = JsonSerializer.Deserialize<StudentModel>(AES.Decrypt(EncryptedJsonString, Config.Password));
-                return FireStore.IsStudentRegistered(Student.StudentId).Result;
+                string EncryptedJsonString = request.Cookies[Config.StudentIdentityCookieName];
+                try
+                {
+                    StudentModel Student = JsonSerializer.Deserialize<StudentModel>(AES.Decrypt(EncryptedJsonString, Config.Password));
+                    return FireStore.IsStudentRegistered(Student.StudentId).Result && FireStore.IsStudentOnline(Student.StudentId).Result;
+                }
+                catch
+                {
+                    return false;
+                }
             }
             else
             {
                 return false;
             }
         }
-
-        public void SetConfirmationCode(string ConfirmCode)
-        {
-            //The Confirmation code expires after 1 minute
-            DateTime Expires = DateTime.Now.AddMinutes(1);
-            //Create Cookie value that will contain the confirmation code encrypted by AES
-            string EncryptedConfirmCode = AES.Encrypt(ConfirmCode, Config.Password);
-            //Register the confirmation cookie that will contain the encrypted confirmation code.
-            CookieHandler.RegisterCookie(Config.ConfirmationCookieName, EncryptedConfirmCode, Expires);
-        }
-
-        public string GetConfirmationCode()
-        {
-            if (CookieHandler.ContainsCookie(Config.ConfirmationCookieName))
-            {
-                return AES.Decrypt(CookieHandler.GetCookieValue(Config.ConfirmationCookieName), Config.Password);
-            }
-            return null;
-        }
-
-        public void DeleteConfirmationCode()
-        {
-            if (CookieHandler.ContainsCookie(Config.ConfirmationCookieName))
-            {
-                CookieHandler.DeleteCookie(Config.ConfirmationCookieName);
-            }
-        }
-
         public string GetStudentId()
         {
             StudentModel Student = StudentSession();
@@ -220,12 +214,45 @@ namespace EVotingSystem.Utilities
         }
         #endregion
 
+        #region "Admin Session Logout/Login"
+
+        #endregion
+
+        #region "Confirmation Code / OTP"
+        public void SetConfirmationCode(string ConfirmCode)
+        {
+            //The Confirmation code expires after 1 minute
+            DateTime Expires = DateTime.Now.AddMinutes(Config.ConfirmationCodeTimeout);
+            //Create Cookie value that will contain the confirmation code encrypted by AES
+            string EncryptedConfirmCode = AES.Encrypt(ConfirmCode, Config.Password);
+            //Register the confirmation cookie that will contain the encrypted confirmation code.
+            CookieHandler.RegisterCookie(Config.ConfirmationCookieName, EncryptedConfirmCode, Expires);
+        }
+        public string GetConfirmationCode()
+        {
+            if (CookieHandler.ContainsCookie(Config.ConfirmationCookieName))
+            {
+                return AES.Decrypt(CookieHandler.GetCookieValue(Config.ConfirmationCookieName), Config.Password);
+            }
+            return null;
+        }
+        public void DeleteConfirmationCode()
+        {
+            if (CookieHandler.ContainsCookie(Config.ConfirmationCookieName))
+            {
+                CookieHandler.DeleteCookie(Config.ConfirmationCookieName);
+            }
+        }
+        #endregion
+
+        #endregion
+
         #region "Static Methods"
         public static StudentModel StudentSession(HttpRequest Request)
         {
-            if (Request.Cookies.ContainsKey(Config.IdentityCookieName))
+            if (Request.Cookies.ContainsKey(Config.StudentIdentityCookieName))
             {
-                string EncryptedJsonString = Request.Cookies[Config.IdentityCookieName];
+                string EncryptedJsonString = Request.Cookies[Config.StudentIdentityCookieName];
                 StudentModel Student = JsonSerializer.Deserialize<StudentModel>(AES.Decrypt(EncryptedJsonString, Config.Password));
                 return new FireStoreManager().GetStudent(Student.StudentId).Result;
             }

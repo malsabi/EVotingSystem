@@ -5,99 +5,103 @@ using System.Text;
 
 namespace EVotingSystem.Cryptography
 {
-    public class AES
+    public static class AES
     {
-        // This constant is used to determine the keysize of the encryption algorithm.
-        private const int keysize = 256;
-        // This constant string is used as a "salt" value for the PasswordDeriveBytes function calls.
-        // This size of the IV (in bytes) must = (keysize / 8).  Default keysize is 256, so the IV must be
-        // 32 bytes long.  Using a 16 character string here gives us 32 bytes when converted to a byte array.
-        private static readonly byte[] initVectorBytes = Encoding.ASCII.GetBytes("0sjufcjbsoyzube6");
+        #region Settings
 
-        /// <summary>
-        /// Encrypt a string using a password
-        /// </summary>
-        /// <param name="plainText">The plain text which should get encrypted</param>
-        /// <param name="passPhrase">The password which should be used for the encryption</param>
-        /// <returns>The encrypted <see cref="plainText" /> as a Base64 string</returns>
-        public static string Encrypt(string plainText, string passPhrase)
+        private static int _iterations = 2;
+        private static int _keySize = 256;
+
+        private static string _hash = "SHA1";
+        private static string _salt = "aselrias38490a32"; // Random
+        private static string _vector = "8947az34awl34kjq"; // Random
+        #endregion
+
+        public static string Encrypt(string value, string password)
         {
-            return Convert.ToBase64String(EncryptToBytes(plainText, passPhrase));
+            return Encrypt<AesManaged>(value, password);
         }
 
-        /// <summary>
-        /// Encrypt a string using a password
-        /// </summary>
-        /// <param name="plainText">he plain text which should get encrypted</param>
-        /// <param name="passPhrase">The password which should be used for the encryption</param>
-        /// <returns>The encrypted <see cref="plainText" /></returns>
-        public static byte[] EncryptToBytes(string plainText, string passPhrase)
+        public static byte[] GetBytes(string Value)
         {
-            byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-            PasswordDeriveBytes password = new PasswordDeriveBytes(passPhrase, null);
-            byte[] keyBytes = password.GetBytes(keysize / 8);
+            return Encoding.UTF8.GetBytes(Value);
+        }
 
-            using (RijndaelManaged symmetricKey = new RijndaelManaged())
+        public static string Encrypt<T>(string value, string password) where T : SymmetricAlgorithm, new()
+        {
+            byte[] vectorBytes = GetBytes(_vector);
+            byte[] saltBytes = GetBytes(_salt);
+            byte[] valueBytes = GetBytes(value);
+
+            byte[] encrypted;
+            using (T cipher = new T())
             {
-                symmetricKey.Mode = CipherMode.CBC;
-                using (ICryptoTransform encryptor = symmetricKey.CreateEncryptor(keyBytes, initVectorBytes))
+                PasswordDeriveBytes _passwordBytes = new PasswordDeriveBytes(password, saltBytes, _hash, _iterations);
+                byte[] keyBytes = _passwordBytes.GetBytes(_keySize / 8);
+
+                cipher.Mode = CipherMode.CBC;
+
+                using (ICryptoTransform encryptor = cipher.CreateEncryptor(keyBytes, vectorBytes))
                 {
-                    using (MemoryStream memoryStream = new MemoryStream())
+                    using (MemoryStream to = new MemoryStream())
                     {
-                        using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+                        using (CryptoStream writer = new CryptoStream(to, encryptor, CryptoStreamMode.Write))
                         {
-                            cryptoStream.Write(plainTextBytes, 0, plainTextBytes.Length);
-                            cryptoStream.FlushFinalBlock();
-                            var cipherTextBytes = memoryStream.ToArray();
-                            return cipherTextBytes;
+                            writer.Write(valueBytes, 0, valueBytes.Length);
+                            writer.FlushFinalBlock();
+                            encrypted = to.ToArray();
                         }
                     }
                 }
+                cipher.Clear();
             }
+            return Convert.ToBase64String(encrypted);
         }
 
-        /// <summary>
-        /// Decrypt a byte array using a password
-        /// </summary>
-        /// <param name="cipherText">The encrypted data</param>
-        /// <param name="passPhrase">The password the <see cref="cipherText" /> was encrypted with</param>
-        /// <returns>The decrypted string</returns>
-        public static string DecryptBytes(byte[] cipherText, string passPhrase)
+        public static string Decrypt(string value, string password)
         {
-            PasswordDeriveBytes password = new PasswordDeriveBytes(passPhrase, null);
-            byte[] keyBytes = password.GetBytes(keysize / 8);
+            return Decrypt<AesManaged>(value, password);
+        }
 
-            using (RijndaelManaged symmetricKey = new RijndaelManaged())
+        public static string Decrypt<T>(string value, string password) where T : SymmetricAlgorithm, new()
+        {
+            byte[] vectorBytes = GetBytes(_vector);
+            byte[] saltBytes = GetBytes(_salt);
+            byte[] valueBytes = Convert.FromBase64String(value);
+
+            byte[] decrypted;
+            int decryptedByteCount = 0;
+
+            using (T cipher = new T())
             {
-                symmetricKey.Mode = CipherMode.CBC;
-                using (ICryptoTransform decryptor = symmetricKey.CreateDecryptor(keyBytes, initVectorBytes))
+                PasswordDeriveBytes _passwordBytes = new PasswordDeriveBytes(password, saltBytes, _hash, _iterations);
+                byte[] keyBytes = _passwordBytes.GetBytes(_keySize / 8);
+
+                cipher.Mode = CipherMode.CBC;
+
+                try
                 {
-                    using (MemoryStream memoryStream = new MemoryStream(cipherText))
+                    using (ICryptoTransform decryptor = cipher.CreateDecryptor(keyBytes, vectorBytes))
                     {
-                        using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
+                        using (MemoryStream from = new MemoryStream(valueBytes))
                         {
-                            var plainTextBytes = new byte[cipherText.Length];
-                            var decryptedByteCount = cryptoStream.Read(plainTextBytes, 0, plainTextBytes.Length);
-                            return Encoding.UTF8.GetString(plainTextBytes, 0, decryptedByteCount);
+                            using (CryptoStream reader = new CryptoStream(from, decryptor, CryptoStreamMode.Read))
+                            {
+                                decrypted = new byte[valueBytes.Length];
+                                decryptedByteCount = reader.Read(decrypted, 0, decrypted.Length);
+                            }
                         }
                     }
                 }
+                catch
+                {
+                    return string.Empty;
+                }
+
+                cipher.Clear();
             }
+            return Encoding.UTF8.GetString(decrypted, 0, decryptedByteCount);
         }
 
-        /// <summary>
-        /// Decrypt a string using a password
-        /// </summary>
-        /// <param name="cipherText">The encrypted string</param>
-        /// <param name="passPhrase">The password the <see cref="cipherText" /> was encrypted with</param>
-        /// <returns>The decrypted string</returns>
-        public static string Decrypt(string cipherText, string passPhrase)
-        {
-            if (string.IsNullOrEmpty(cipherText))
-            {
-                return string.Empty;
-            }
-            return DecryptBytes(Convert.FromBase64String(cipherText), passPhrase);
-        }
     }
 }

@@ -1,6 +1,5 @@
-﻿using Google.Cloud.Firestore;
-using System;
-using System.Collections.Generic;
+﻿using EVotingSystem.Helpers;
+using Google.Cloud.Firestore;
 
 namespace EVotingSystem.Models
 {
@@ -23,9 +22,23 @@ namespace EVotingSystem.Models
         public string Image { get; set; }
 
         [FirestoreProperty]
-        public string TotalVotes { get; set; }
+        public string LastVoteReceived { get; set; }
 
-        [FirestoreProperty]
-        public DateTime LastVoteReceived { get; set; }
+        public void EncryptProperties()
+        {
+            this.Name   = CandidateHelper.EncryptField(this.Name);
+            this.Gender = CandidateHelper.EncryptField(this.Gender);
+            this.Id     = CandidateHelper.EncryptField(this.Id);
+            this.Speach = CandidateHelper.EncryptField(this.Speach);
+            this.Image  = CandidateHelper.EncryptField(this.Image);
+        }
+        public void DecryptProperties()
+        {
+            this.Name   = CandidateHelper.DecryptField(this.Name);
+            this.Gender = CandidateHelper.DecryptField(this.Gender);
+            this.Id     = CandidateHelper.DecryptField(this.Id);
+            this.Speach = CandidateHelper.DecryptField(this.Speach);
+            this.Image  = CandidateHelper.DecryptField(this.Image);
+        }
     }
 }

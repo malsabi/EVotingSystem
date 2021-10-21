@@ -1,44 +1,28 @@
-﻿using EVotingSystem.Models;
+﻿using EVotingSystem.Constants;
+using EVotingSystem.Cryptography;
 
 namespace EVotingSystem.Helpers
 {
     public class StudentHelper
     {
         /// <summary>
-        /// Takes a StudentModel to extract the information and create a Statistical information.
+        /// Encryptes the specific student field
         /// </summary>
-        /// <param name="Student">Represents the Student Model</param>
-        /// <returns>Returns Statistical information of the student</returns>
-        public static StudentStatistics GetStudentStatistics(StudentModel Student)
+        /// <param name="Field">Represents the student field</param>
+        /// <returns>Returns encrypted AES for the specific student field</returns>
+        public static string EncryptField(string Field)
         {
-            StudentStatistics studentStatistics = new StudentStatistics();
+            return FirestoreEncoder.EncodeForFirebaseKey(AES.Encrypt(Field, Config.Password));
+        }
 
-            if (string.IsNullOrEmpty(Student.TotalVotesApplied) == false && Student.SentVotes.Count > 0)
-            {
-                int TotalVotes = int.Parse(Student.TotalVotesApplied);
-                int MaleVotes = 0, FemaleVotes = 0;
-
-                foreach (CandidateModel CM in Student.SentVotes)
-                {
-                    if (CM.Gender.Equals("Male"))
-                    {
-                        MaleVotes++;
-                    }
-                    else
-                    {
-                        FemaleVotes++;
-                    }
-                }
-
-                double PercentageMaleVotes = MaleVotes / (double)TotalVotes * 100.0;
-                double PercentageFemaleVotes = FemaleVotes / (double)TotalVotes * 100.0;
-
-                studentStatistics.TotalVotes = TotalVotes.ToString();
-                studentStatistics.PercentageMalesTotalVotes = PercentageMaleVotes.ToString();
-                studentStatistics.PercentageFemalesTotalVotes = PercentageFemaleVotes.ToString();
-            }
-
-            return studentStatistics;
+        /// <summary>
+        /// Decrypts the specific encoded student field
+        /// </summary>
+        /// <param name="EncodedField">Represents the encoded student field</param>
+        /// <returns>Retrusn decrypted AEs for the specific student field</returns>
+        public static string DecryptField(string EncodedField)
+        {
+            return AES.Decrypt(FirestoreEncoder.DecodeFromFirebaseKey(EncodedField), Config.Password);
         }
     }
 }

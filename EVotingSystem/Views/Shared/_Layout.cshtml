@@ -12,7 +12,6 @@
 </head>
 <body class="bg-white mainGrid">
     <header>
-   
         <nav class="navbar navbar-expand-xl navbar-light bg-light border-bottom border-primary">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
@@ -39,17 +38,14 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Candidates" asp-action="Index">CANDIDATES LIST</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Dashboard" asp-action="Index">DASHBOARD</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Contact" asp-action="Index">CONTACT</a>
                         </li>
                     </ul>
                     <form class="form-inline ml-auto">
                         @{
-                            @if (new IdentityHandler().IsUserLoggedIn(HttpContextAccessor.HttpContext.Request))
+                            @if (new IdentityHandler().IsStudentLoggedIn(HttpContextAccessor.HttpContext.Request, HttpContextAccessor.HttpContext.Response))
                             {
-                                <button class="btn btn-outline-primary btn-lg" style="border-radius: 40px;" asp-area="" asp-controller="Home" asp-action="Profile">My Profile</button>
+                                <button class="btn btn-outline-primary btn-lg" style="border-radius: 40px;" asp-area="" asp-controller="Profile" asp-action="Index">My Profile</button>
                                 <button class="btn btn-primary btn-lg ml-md-2" style="border-radius: 40px;" asp-area="" asp-controller="Home" asp-action="Logout">LOGOUT</button>
                             }
                             else

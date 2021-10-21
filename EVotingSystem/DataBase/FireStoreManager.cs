@@ -10,6 +10,7 @@ namespace EVotingSystem.DataBase
     /// <summary>
     /// A class that is responsible for handling GET/SET/UPDATE/REMOVE in the fire store database.
     /// A class that provides some useful functions for Signing-In/Signing-Out/Registering.
+    /// A class that provides some useful functions for Candidate Insertion/Update/Remove.
     /// </summary>
     public class FireStoreManager
     {
@@ -86,9 +87,18 @@ namespace EVotingSystem.DataBase
         /// <param name="Student">Represents the Student Model</param>
         public async void RegisterStudent(StudentModel Student)
         {
-            DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(Student.StudentId);
-            await Document.SetAsync(Student, SetOptions.Overwrite);
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(Student.StudentId);
+                await Document.SetAsync(Student, SetOptions.Overwrite);
+            }
+            catch
+            {
+            }
         }
+
+    
+
         /// <summary>
         /// Gets the Student Information from the database
         /// </summary>
@@ -96,13 +106,20 @@ namespace EVotingSystem.DataBase
         /// <returns>Returns the student if registered in the database otherwise null</returns>
         public async Task<StudentModel> GetStudent(string StudentId)
         {
-            DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(StudentId);
-            DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
-            if (SnapShot.Exists)
+            try
             {
-                return SnapShot.ConvertTo<StudentModel>();
+                DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(StudentId);
+                DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
+                if (SnapShot.Exists)
+                {
+                    return SnapShot.ConvertTo<StudentModel>();
+                }
+                else
+                {
+                    return null;
+                }
             }
-            else
+            catch
             {
                 return null;
             }
@@ -114,9 +131,16 @@ namespace EVotingSystem.DataBase
         /// <returns>Returns true if the student is registered in the database otherwise false.</returns>
         public async Task<bool> IsStudentRegistered(string StudentId)
         {
-            DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(StudentId);
-            DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
-            return SnapShot.Exists;
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(StudentId);
+                DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
+                return SnapShot.Exists;
+            }
+            catch
+            {
+                return false;
+            }
         }
         /// <summary>
         /// Checks if the student is active and loggedin in the database
@@ -125,11 +149,18 @@ namespace EVotingSystem.DataBase
         /// <returns>Returns true if the student is online in the database otherwise false</returns>
         public async Task<bool> IsStudentOnline(string StudentId)
         {
-            DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(StudentId);
-            DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
-            if (SnapShot.Exists)
+            try
             {
-                return SnapShot.GetValue<string>("Status").Equals(Config.StudentOnline);
+                DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(StudentId);
+                DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
+                if (SnapShot.Exists)
+                {
+                    return SnapShot.GetValue<string>("Status").Equals(Config.StudentOnline);
+                }
+            }
+            catch
+            {
+                return false;
             }
             return false;
         }
@@ -139,15 +170,19 @@ namespace EVotingSystem.DataBase
         /// <param name="Login">Represents the login model</param>
         public async void LoginStudent(LoginModel Login)
         {
-            DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(Login.StudentId);
-
-            Dictionary<string, object> Fields = new Dictionary<string, object>
+            try
             {
-                { "Status", Config.StudentOnline },
-                { "StaySignedIn", Login.StaySignedIn }
-            };
-
-            await Document.UpdateAsync(Fields);
+                DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(Login.StudentId);
+                Dictionary<string, object> Fields = new Dictionary<string, object>
+                {
+                    { "Status", Config.StudentOnline },
+                    { "StaySignedIn", Login.StaySignedIn }
+                };
+                await Document.UpdateAsync(Fields);
+            }
+            catch
+            {
+            }
         }
         /// <summary>
         /// Changes the status of the student to Offline, and updates the StaySignedIn to false.
@@ -155,15 +190,19 @@ namespace EVotingSystem.DataBase
         /// <param name="StudentId">Represents the login model</param>
         public async void LogoutStudent(StudentModel Student)
         {
-            DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(Student.StudentId);
-
-            Dictionary<string, object> Fields = new Dictionary<string, object>
+            try
             {
-                { "Status", Config.StudentOffline },
-                { "StaySignedIn", "false" }
-            };
-
-            await Document.UpdateAsync(Fields);
+                DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(Student.StudentId);
+                Dictionary<string, object> Fields = new Dictionary<string, object>
+                {
+                    { "Status", Config.StudentOffline },
+                    { "StaySignedIn", "false" }
+                };
+                await Document.UpdateAsync(Fields);
+            }
+            catch
+            {
+            }
         }
         /// <summary>
         /// Gets the student phone number by providing the student Id
@@ -172,20 +211,23 @@ namespace EVotingSystem.DataBase
         /// <returns>Returns the student phone number from the database if registered otherwise empty string</returns>
         public async Task<string> GetStudentPhone(string StudentId)
         {
-            DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(StudentId);
-            DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
-            if (SnapShot.Exists)
+            try
             {
-                try
+                DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(StudentId);
+                DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
+                if (SnapShot.Exists)
                 {
                     return SnapShot.GetValue<string>("Phone");
                 }
-                catch
+                else
                 {
                     return "";
                 }
             }
-            return "";
+            catch
+            {
+                return "";
+            }
         }
         /// <summary>
         /// Updates the Student model in the database
@@ -193,8 +235,15 @@ namespace EVotingSystem.DataBase
         /// <param name="Student">Represents the student model</param>
         public async Task<WriteResult> UpdateStudent(StudentModel Student)
         {
-            DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(Student.StudentId);
-            return await Document.SetAsync(Student, SetOptions.Overwrite);
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.StudentPath).Document(Student.StudentId);
+                return await Document.SetAsync(Student, SetOptions.Overwrite);
+            }
+            catch
+            {
+                return null;
+            }
         }
         #endregion
         #region "Candidate"
@@ -204,8 +253,44 @@ namespace EVotingSystem.DataBase
         /// <param name="Candidate">Represents the Candidate Model</param>
         public async void AddCandidate(CandidateModel Candidate)
         {
+            try
+            {
+                DocumentReference CandidateDocument = FireStoreDataBase.Collection(Config.CandidatePath).Document(Candidate.Id);
+                await CandidateDocument.SetAsync(Candidate, SetOptions.Overwrite);
+
+                CandidateVoteModel CandidateVote = new CandidateVoteModel()
+                {
+                    Id = Candidate.Id,
+                    TotalVotes = "0",
+                    StudentVoteCollection = null
+                };
+
+                DocumentReference CandidateVoteDocument = FireStoreDataBase.Collection(Config.CandidateVotePath).Document(Candidate.Id);
+                await CandidateVoteDocument.SetAsync(CandidateVote, SetOptions.Overwrite);
+            }
+            catch
+            {
+            }
+        }
+        /// <summary>
+        /// Removes the candidate from the database
+        /// </summary>
+        /// <param name="Id">Represents the Id of the candidate</param>
+        public async void RemoveCandidate(string Id)
+        {
+            DocumentReference CandidateDocument = FireStoreDataBase.Collection(Config.CandidatePath).Document(Id);
+            await CandidateDocument.DeleteAsync();
+            DocumentReference CandidateVoteDocument = FireStoreDataBase.Collection(Config.CandidateVotePath).Document(Id);
+            await CandidateVoteDocument.DeleteAsync();
+        }
+        /// <summary>
+        /// Updates the Candidate model in the database
+        /// </summary>
+        /// <param name="Candidate">Represents the candidate model</param>
+        public async Task<WriteResult> UpdateCandidate(CandidateModel Candidate)
+        {
             DocumentReference Document = FireStoreDataBase.Collection(Config.CandidatePath).Document(Candidate.Id);
-            await Document.SetAsync(Candidate, SetOptions.Overwrite);
+            return await Document.SetAsync(Candidate, SetOptions.Overwrite);
         }
         /// <summary>
         /// Gets the Candidate Information from the database
@@ -214,13 +299,20 @@ namespace EVotingSystem.DataBase
         /// <returns>Returns the Candidate if added in the database otherwise null</returns>
         public async Task<CandidateModel> GetCandidate(string Id)
         {
-            DocumentReference Document = FireStoreDataBase.Collection(Config.CandidatePath).Document(Id);
-            DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
-            if (SnapShot.Exists)
+            try
             {
-                return SnapShot.ConvertTo<CandidateModel>();
+                DocumentReference Document = FireStoreDataBase.Collection(Config.CandidatePath).Document(Id);
+                DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
+                if (SnapShot.Exists)
+                {
+                    return SnapShot.ConvertTo<CandidateModel>();
+                }
+                else
+                {
+                    return null;
+                }
             }
-            else
+            catch
             {
                 return null;
             }
@@ -232,9 +324,16 @@ namespace EVotingSystem.DataBase
         /// <returns>Returns true if the candidate is added in the database otherwise false.</returns>
         public async Task<bool> IsCandidateAdded(string Id)
         {
-            DocumentReference Document = FireStoreDataBase.Collection(Config.CandidatePath).Document(Id);
-            DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
-            return SnapShot.Exists;
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.CandidatePath).Document(Id);
+                DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
+                return SnapShot.Exists;
+            }
+            catch
+            {
+                return false;
+            }
         }
         /// <summary>
         /// Gets all of the candidates from the specific path in the database
@@ -257,14 +356,77 @@ namespace EVotingSystem.DataBase
             return Candidates;
         }
         /// <summary>
-        /// Updates the Candidate model in the database
+        /// Removes all of the candidates and also removes the candidate vote
         /// </summary>
-        /// <param name="Candidate">Represents the candidate model</param>
-        public async Task<WriteResult> UpdateCandidate(CandidateModel Candidate)
+        public async void RemoveAllCandidates()
         {
-            DocumentReference Document = FireStoreDataBase.Collection(Config.CandidatePath).Document(Candidate.Id);
-            return await Document.SetAsync(Candidate, SetOptions.Overwrite);
+            CollectionReference Collection = FireStoreDataBase.Collection(Config.CandidatePath);
+            QuerySnapshot CandidatesQuerySnapShot = await Collection.GetSnapshotAsync();
+            foreach (DocumentSnapshot Document in CandidatesQuerySnapShot.Documents)
+            {
+                if (Document.Exists)
+                {
+                    RemoveCandidate(Document.Id);
+                }
+            }
         }
+ 
+        public async void UpdateCandidates()
+        {
+            List<CandidateModel> Candidates = GetAllCandidates().Result;
+            foreach (CandidateModel C in Candidates)
+            {
+                C.DecryptProperties();
+                CandidateVoteModel CandidateVote = new CandidateVoteModel()
+                {
+                    Id = C.Id,
+                    TotalVotes = "0",
+                    StudentVoteCollection = null
+                };
+                CandidateVote.EncryptProperties();
+                DocumentReference CandidateVoteDocument = FireStoreDataBase.Collection(Config.CandidateVotePath).Document(CandidateVote.Id);
+                await CandidateVoteDocument.SetAsync(CandidateVote, SetOptions.Overwrite);
+            }
+        }
+        #endregion
+        #region "CandidateVote"
+        /// <summary>
+        /// Gets the candidate vote model from the CandidateVote Entity by the Id
+        /// </summary>
+        /// <param name="Id">Represents the Candidate vote Id</param>
+        /// <returns>Returns Candidate Vote Model</returns>
+        public async Task<CandidateVoteModel> GetCandidateVote(string Id)
+        {
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.CandidateVotePath).Document(Id);
+                DocumentSnapshot SnapShot = await Document.GetSnapshotAsync();
+                if (SnapShot.Exists)
+                {
+                    return SnapShot.ConvertTo<CandidateVoteModel>();
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        /// <summary>
+        /// Updates the specific candidate vote model in the database
+        /// </summary>
+        /// <param name="CandidateVote">Represents the candidate vote model</param>
+        /// <returns>Returns if the task succeeded in updating the candidate vote model in the database</returns>
+        public async Task<WriteResult> UpdateCandidateVote(CandidateVoteModel CandidateVote)
+        {
+            DocumentReference Document = FireStoreDataBase.Collection(Config.CandidateVotePath).Document(CandidateVote.Id);
+            return await Document.SetAsync(CandidateVote, SetOptions.Overwrite);
+        }
+        #endregion
+        #region "AccessPanel / Dashboard"
         #endregion
         #endregion
     }

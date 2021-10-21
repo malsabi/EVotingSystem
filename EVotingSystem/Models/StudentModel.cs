@@ -1,6 +1,6 @@
-﻿using Google.Cloud.Firestore;
+﻿using EVotingSystem.Helpers;
+using Google.Cloud.Firestore;
 using System;
-using System.Collections.Generic;
 
 namespace EVotingSystem.Models
 {
@@ -29,6 +29,9 @@ namespace EVotingSystem.Models
         public string Phone { get; set; }
 
         [FirestoreProperty]
+        public string Gender { get; set; }
+
+        [FirestoreProperty]
         public string Status { get; set; }
 
         [FirestoreProperty]
@@ -40,7 +43,27 @@ namespace EVotingSystem.Models
         [FirestoreProperty]
         public string TotalVotesApplied { get; set; }
 
-        [FirestoreProperty]
-        public List<CandidateModel> SentVotes { get; set; }
+
+        public void EncryptProperties()
+        {
+            this.FirstName  =  StudentHelper.EncryptField(this.FirstName);
+            this.LastName   =  StudentHelper.EncryptField(this.LastName);
+            this.NationalId =  StudentHelper.EncryptField(this.NationalId);
+            this.StudentId  =  StudentHelper.EncryptField(this.StudentId);
+            this.Email      =  StudentHelper.EncryptField(this.Email);
+            this.Password   =  StudentHelper.EncryptField(this.Password);
+            this.Phone      =  StudentHelper.EncryptField(this.Phone);
+        }
+
+        public void DecryptProperties()
+        {
+            this.FirstName  =  StudentHelper.DecryptField(this.FirstName);
+            this.LastName   =  StudentHelper.DecryptField(this.LastName);
+            this.NationalId =  StudentHelper.DecryptField(this.NationalId);
+            this.StudentId  =  StudentHelper.DecryptField(this.StudentId);
+            this.Email      =  StudentHelper.DecryptField(this.Email);
+            this.Password   =  StudentHelper.DecryptField(this.Password);
+            this.Phone      =  StudentHelper.DecryptField(this.Phone);
+        }
     }
 }

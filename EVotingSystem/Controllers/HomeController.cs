@@ -23,7 +23,7 @@ namespace EVotingSystem.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            if (Identity.IsUserLoggedIn())
+            if (Identity.IsStudentLoggedIn())
             {
                 return View(Identity.StudentSession());
             }
@@ -36,12 +36,12 @@ namespace EVotingSystem.Controllers
         [HttpGet]
         public IActionResult Logout()
         {
-            if (Identity.IsUserLoggedIn())
+            if (Identity.IsStudentLoggedIn())
             {
                 //Change status in the database
                 FireStore.LogoutStudent(Identity.StudentSession());
                 //Remove the user session cookie.
-                Identity.LogOut();
+                Identity.LogoutStudent();
             }
             return RedirectToAction("Index", "Home");
         }
