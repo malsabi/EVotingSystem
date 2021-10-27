@@ -8,7 +8,7 @@
     <title>@ViewData["Title"] - EVotingSystem</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" />
 </head>
 <body class="bg-white mainGrid">
     <header>
@@ -43,7 +43,6 @@
                             {
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Candidates" asp-action="Index">CANDIDATES LIST</a>
                             }
-
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Contact" asp-action="Index">CONTACT</a>
@@ -53,17 +52,32 @@
                         @{
                             @if (new IdentityHandler().IsStudentLoggedIn(HttpContextAccessor.HttpContext.Request, HttpContextAccessor.HttpContext.Response))
                             {
-                                <button class="btn btn-outline-primary btn-lg" style="border-radius: 40px;" asp-area="" asp-controller="Profile" asp-action="Index">My Profile</button>
-                                <button class="btn btn-primary btn-lg ml-md-2" style="border-radius: 40px;" asp-area="" asp-controller="Home" asp-action="Logout">LOGOUT</button>
+                                <button class="btn btn-outline-primary btn-lg" style="border-radius: 40px;" asp-area="" asp-controller="Profile" asp-action="Index">
+                                    <i class="fas fa-user pr-md-2" aria-hidden="true"></i>
+                                    My Profile
+                                </button>
+                                <button class="btn btn-primary btn-lg ml-md-2" style="border-radius: 40px;" asp-area="" asp-controller="Home" asp-action="Logout">
+                                    <i class="fas fa-sign-out-alt pr-md-2" aria-hidden="true"></i>
+                                    LOGOUT
+                                </button>
                             }
                             else if (new IdentityHandler().IsAdminLoggedIn(HttpContextAccessor.HttpContext.Request, HttpContextAccessor.HttpContext.Response))
                             {
-                                <button class="btn btn-primary btn-lg ml-md-2" style="border-radius: 40px;" asp-area="" asp-controller="Home" asp-action="Logout">LOGOUT</button>
+                                <button class="btn btn-primary btn-lg ml-md-2" style="border-radius: 40px;" asp-area="" asp-controller="Home" asp-action="Logout">
+                                    <i class="fas fa-sign-out-alt pr-md-2" aria-hidden="true"></i>
+                                    LOGOUT
+                                </button>
                             }
                             else
                             {
-                                <button class="btn btn-outline-primary btn-lg" style="border-radius: 40px;" asp-area="" asp-controller="Login" asp-action="Index">LOGIN</button>
-                                <button class="btn btn-primary btn-lg ml-md-2" style="border-radius: 40px;" asp-area="" asp-controller="SignUp" asp-action="Index">SIGN-UP</button>
+                                <button class="btn btn-outline-primary btn-lg" style="border-radius: 40px;" asp-area="" asp-controller="Login" asp-action="Index">
+                                    <i class="fas fa-sign-in-alt pr-md-2" aria-hidden="true"></i>
+                                    LOGIN
+                                </button>
+                                <button class="btn btn-primary btn-lg ml-md-2" style="border-radius: 40px;" asp-area="" asp-controller="SignUp" asp-action="Index">
+                                    <i class="fas fa-user-plus pr-md-2" aria-hidden="true"></i>
+                                    SIGN-UP
+                                </button>
                             }
                         }
                     </form>
@@ -88,13 +102,13 @@
             </div>
             <div class="row row-no-margin justify-content-center">
                 <div class="col-xs-12 col-no-padding">
-                    <a href="#" class="fa fa-twitter"></a>
+                    <a href="https://www.instagram.com/evotingsystemuae/" class="fab fa-twitter"></a>
                 </div>
                 <div class="col-xs-12 col-no-padding">
-                    <a href="#" class="fa fa-facebook"></a>
+                    <a href="https://www.instagram.com/evotingsystemuae/" class="fab fa-facebook"></a>
                 </div>
                 <div class="col-xs-12 col-no-padding">
-                    <a href="#" class="fa fa-instagram"></a>
+                    <a href="https://www.instagram.com/evotingsystemuae/" class="fab fa-instagram"></a>
                 </div>
             </div>
             <div class="row row-no-margin justify-content-center">
@@ -103,6 +117,9 @@
         </div>
     </footer>
 
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>

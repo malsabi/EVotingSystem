@@ -1,7 +1,9 @@
 ﻿using EVotingSystem.Constants;
 using EVotingSystem.Cryptography;
 using EVotingSystem.DataBase;
-using EVotingSystem.Models;
+using EVotingSystem.Models.Identity;
+using EVotingSystem.Models.Student;
+using EVotingSystem.Models.Admin;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;

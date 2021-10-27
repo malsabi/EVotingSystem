@@ -1,5 +1,5 @@
 ﻿using EVotingSystem.DataBase;
-using EVotingSystem.Models;
+using EVotingSystem.Models.Admin;
 using EVotingSystem.Utilities;
 using Microsoft.AspNetCore.Mvc;
 

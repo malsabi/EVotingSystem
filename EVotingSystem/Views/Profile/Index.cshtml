@@ -1,6 +1,8 @@
 ﻿@using EVotingSystem.Helpers;
 @using Microsoft.AspNetCore.Html;
 @using EVotingSystem.Utilities;
+@using EVotingSystem.Models.Student;
+@using EVotingSystem.Models.Candidate;
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @model StudentModel
 @{
@@ -43,37 +45,37 @@
                     <div class="form-group form-row">
                         <div class="col-md-6 mb-3">
                             <label for="FirstNameTextBox">First Name:</label>
-                            <input readonly class="form-control-plaintext" id="FirstNameTextBox" value="@Model.FirstName">
+                            <input readonly class="form-control" id="FirstNameTextBox" value="@Model.FirstName">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="LastNameTextBox">Last Name:</label>
-                            <input readonly class="form-control-plaintext" id="LastNameTextBox" value="@Model.LastName">
+                            <input readonly class="form-control" id="LastNameTextBox" value="@Model.LastName">
                         </div>
                     </div>
                     <div class="form-group form-row">
                         <div class="col-md-6 mb-3">
                             <label for="StudentIdTextBox">Student ID:</label>
-                            <input readonly class="form-control-plaintext" id="StudentIdTextBox" value="@Model.StudentId">
+                            <input readonly class="form-control" id="StudentIdTextBox" value="@Model.StudentId">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="NationalIdTextBox">National ID:</label>
-                            <input readonly class="form-control-plaintext" id="NationalIdTextBox" value="@Model.NationalId">
+                            <input readonly class="form-control" id="NationalIdTextBox" value="@Model.NationalId">
                         </div>
                     </div>
                     <div class="form-group form-row">
                         <div class="col-md-6 mb-3">
                             <label for="EmailTextBox">Email Address:</label>
-                            <input readonly class="form-control-plaintext" id="EmailTextBox" value="@Model.Email">
+                            <input readonly class="form-control" id="EmailTextBox" value="@Model.Email">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="PhoneTextBox">Phone Number:</label>
-                            <input readonly class="form-control-plaintext" id="PhoneTextBox" value="@Model.Phone">
+                            <input readonly class="form-control" id="PhoneTextBox" value="@Model.Phone">
                         </div>
                     </div>
                     <div class="form-group form-row">
                         <div class="col-md-6 mb-3">
                             <label for="GenderTextBox">Gender:</label>
-                            <input readonly class="form-control-plaintext" id="GenderTextBox" value="@Model.Gender">
+                            <input readonly class="form-control" id="GenderTextBox" value="@Model.Gender">
                         </div>
                     </div>
                     @{ Model.EncryptProperties(); }

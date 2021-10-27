@@ -2,7 +2,7 @@
 using Google.Cloud.Firestore;
 using System;
 
-namespace EVotingSystem.Models
+namespace EVotingSystem.Models.Student
 {
     [FirestoreData]
     public class StudentModel

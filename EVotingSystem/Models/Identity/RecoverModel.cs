@@ -1,6 +1,6 @@
 ﻿using Google.Cloud.Firestore;
 
-namespace EVotingSystem.Models
+namespace EVotingSystem.Models.Identity
 {
     [FirestoreData]
     public class RecoverModel

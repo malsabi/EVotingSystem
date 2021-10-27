@@ -1,7 +1,8 @@
 ﻿using EVotingSystem.Constants;
 using EVotingSystem.DataBase;
 using EVotingSystem.Helpers;
-using EVotingSystem.Models;
+using EVotingSystem.Models.Identity;
+using EVotingSystem.Models.Student;
 using EVotingSystem.Utilities;
 using Microsoft.AspNetCore.Mvc;
 

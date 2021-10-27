@@ -116,5 +116,17 @@
         /// </summary>
         public static readonly int MaximumStudentVotes = 2;
         #endregion
+
+        #region "GENDER CONSTANTS"
+        /// <summary>
+        /// Represents a static field that stores male value.
+        /// </summary>
+        public readonly static string Male = "Male";
+
+        /// <summary>
+        /// Represents a static field that stores female value.
+        /// </summary>
+        public readonly static string Female = "Female";
+        #endregion
     }
 }

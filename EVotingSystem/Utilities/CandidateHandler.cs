@@ -1,6 +1,7 @@
 ﻿using EVotingSystem.Constants;
 using EVotingSystem.DataBase;
-using EVotingSystem.Models;
+using EVotingSystem.Models.Candidate;
+using EVotingSystem.Models.Student;
 using System;
 using System.Collections.Generic;
 using System.Linq;

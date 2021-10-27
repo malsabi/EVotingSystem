@@ -1,7 +1,7 @@
 ﻿using EVotingSystem.Helpers;
 using Google.Cloud.Firestore;
 
-namespace EVotingSystem.Models
+namespace EVotingSystem.Models.Student
 {
     [FirestoreData]
     public class StudentVoteModel

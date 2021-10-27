@@ -3,7 +3,7 @@ using EVotingSystem.Validation;
 using Google.Cloud.Firestore;
 using System.ComponentModel.DataAnnotations;
 
-namespace EVotingSystem.Models
+namespace EVotingSystem.Models.Identity
 {
     [FirestoreData]
     public class LoginModel

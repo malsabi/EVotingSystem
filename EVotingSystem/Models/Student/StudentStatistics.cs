@@ -1,4 +1,4 @@
-﻿namespace EVotingSystem.Models
+﻿namespace EVotingSystem.Models.Student
 {
     public class StudentStatistics
     {

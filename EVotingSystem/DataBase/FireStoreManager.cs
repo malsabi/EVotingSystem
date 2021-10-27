@@ -1,5 +1,8 @@
 ﻿using EVotingSystem.Constants;
-using EVotingSystem.Models;
+using EVotingSystem.Models.Identity;
+using EVotingSystem.Models.Candidate;
+using EVotingSystem.Models.Student;
+using EVotingSystem.Models.Admin;
 using Google.Cloud.Firestore;
 using System;
 using System.Collections.Generic;
@@ -248,6 +251,35 @@ namespace EVotingSystem.DataBase
                 return null;
             }
         }
+        /// <summary>
+        /// Gets all of the students from the specific path in the database
+        /// </summary>
+        /// <returns>Returns a list of candidate model</returns>
+        public async Task<List<StudentModel>> GetAllStudents(bool DecryptProperties = false)
+        {
+            CollectionReference Collection = FireStoreDataBase.Collection(Config.StudentPath);
+            QuerySnapshot CandidatesQuerySnapShot = await Collection.GetSnapshotAsync();
+
+            List<StudentModel> Students = new List<StudentModel>();
+
+            foreach (DocumentSnapshot Document in CandidatesQuerySnapShot.Documents)
+            {
+                if (Document.Exists)
+                {
+                    StudentModel Student = Document.ConvertTo<StudentModel>();
+                    if (DecryptProperties)
+                    {
+                        Student.DecryptProperties();
+                        Students.Add(Student);
+                    }
+                    else
+                    {
+                        Students.Add(Student);
+                    }
+                }
+            }
+            return Students;
+        }
         #endregion
 
         #region "Candidate"
@@ -343,7 +375,7 @@ namespace EVotingSystem.DataBase
         /// Gets all of the candidates from the specific path in the database
         /// </summary>
         /// <returns>Returns a list of candidate model</returns>
-        public async Task<List<CandidateModel>> GetAllCandidates()
+        public async Task<List<CandidateModel>> GetAllCandidates(bool DecryptProperties = false)
         {
             CollectionReference Collection = FireStoreDataBase.Collection(Config.CandidatePath);
             QuerySnapshot CandidatesQuerySnapShot = await Collection.GetSnapshotAsync();
@@ -352,9 +384,15 @@ namespace EVotingSystem.DataBase
 
             foreach (DocumentSnapshot Document in CandidatesQuerySnapShot.Documents)
             {
-                if (Document.Exists)
+                CandidateModel Candidate = Document.ConvertTo<CandidateModel>();
+                if (DecryptProperties)
                 {
-                    Candidates.Add(Document.ConvertTo<CandidateModel>());
+                    Candidate.DecryptProperties();
+                    Candidates.Add(Candidate);
+                }
+                else
+                {
+                    Candidates.Add(Candidate);
                 }
             }
             return Candidates;
@@ -429,6 +467,32 @@ namespace EVotingSystem.DataBase
         {
             DocumentReference Document = FireStoreDataBase.Collection(Config.CandidateVotePath).Document(CandidateVote.Id);
             return await Document.SetAsync(CandidateVote, SetOptions.Overwrite);
+        }
+        /// <summary>
+        /// Gets all of the votes from the specific path in the database
+        /// </summary>
+        /// <returns>Returns a list of candidate model</returns>
+        public async Task<List<CandidateVoteModel>> GetAllCandidateVotes(bool DecryptProperties = false)
+        {
+            CollectionReference Collection = FireStoreDataBase.Collection(Config.CandidateVotePath);
+            QuerySnapshot CandidatesQuerySnapShot = await Collection.GetSnapshotAsync();
+
+            List<CandidateVoteModel> CandidateVotes = new List<CandidateVoteModel>();
+
+            foreach (DocumentSnapshot Document in CandidatesQuerySnapShot.Documents)
+            {
+                CandidateVoteModel Vote = Document.ConvertTo<CandidateVoteModel>();
+                if (DecryptProperties)
+                {
+                    Vote.DecryptProperties();
+                    CandidateVotes.Add(Vote);
+                }
+                else
+                {
+                    CandidateVotes.Add(Vote);
+                }
+            }
+            return CandidateVotes;
         }
         #endregion
 

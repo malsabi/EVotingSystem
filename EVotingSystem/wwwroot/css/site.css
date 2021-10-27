@@ -57,7 +57,7 @@ body {
     min-height: 80px;
 }
 
-.fa {
+.fab {
     padding: 13.5px;
     width: 40px;
     height: 42px;
@@ -65,7 +65,7 @@ body {
     border-radius: 50%;
 }
 
-.fa:hover {
+.fab:hover {
     opacity: 0.7;
 }
 
@@ -91,3 +91,25 @@ body {
     width: 32px;
 }
 /*END OF ABOUT US STYLES*/
+
+/*START OF DASHBOARD STYLES*/
+.highcharts-data-labels span 
+{
+    font-size: 9px !important;
+    width: 100px;
+    word-break: break-word !important;
+    white-space: normal !important;
+}
+
+.close
+{
+    margin-left: 1.2rem !important;
+    float: left !important;
+}
+
+.table-scroll-bar 
+{
+    height: 400px;
+    overflow: scroll;
+}
+/*END OF DASHBOARD STYLES*/

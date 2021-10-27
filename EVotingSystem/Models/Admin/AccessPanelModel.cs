@@ -1,40 +1,34 @@
 ﻿using EVotingSystem.Helpers;
 using Google.Cloud.Firestore;
+using System.ComponentModel.DataAnnotations;
 
-namespace EVotingSystem.Models
+namespace EVotingSystem.Models.Admin
 {
     [FirestoreData]
-    public class AdminModel
+    public class AccessPanelModel
     {
         [FirestoreProperty]
-        public string Name { get; set; }
-
-        [FirestoreProperty]
-        public string Gender { get; set; }
-
-        [FirestoreProperty]
+        [Required(ErrorMessage = "Please insert your email")]
+        [MaxLength(30, ErrorMessage = "Email cannot exceed more than 30 characters")]
         public string Email { get; set; }
 
         [FirestoreProperty]
+        [Required(ErrorMessage = "Please insert your password")]
+        [MaxLength(30, ErrorMessage = "Password cannot exceed more than 30 characters")]
         public string Password { get; set; }
 
         [FirestoreProperty]
         public string StaySignedIn { get; set; }
 
-        [FirestoreProperty]
-        public string Status { get; set; }
 
         public void EncryptProperties()
         {
-            this.Name     = AdminHelper.EncryptField(this.Name);
             this.Email    = AdminHelper.EncryptField(this.Email);
             this.Password = AdminHelper.EncryptField(this.Password);
         }
-
         public void DecryptProperties()
         {
-            this.Name     = AdminHelper.DecryptField(this.Name);
-            this.Email    = AdminHelper.DecryptField(this.Email);
+            this.Email = AdminHelper.DecryptField(this.Email);
             this.Password = AdminHelper.DecryptField(this.Password);
         }
     }

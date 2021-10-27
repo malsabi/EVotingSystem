@@ -1,6 +1,8 @@
 ﻿@using EVotingSystem.Helpers;
 @using Microsoft.AspNetCore.Html;
 @using EVotingSystem.Utilities;
+@using EVotingSystem.Models.Student;
+@using EVotingSystem.Models.Candidate;
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @model CandidateModel[]
 @{
@@ -45,17 +47,17 @@
     </div>
 </div>
 @*@if (Student != null && Student.SentVotes != null && Student.SentVotes.Any(c => c.Id == CM.Id))
-{
-    <button class="btn btn-secondary btn-block mt-md-2 disabled" type="button">
-        Voted
-    </button>
-}
-else
-{
-    <button class="btn btn-primary btn-block mt-md-2" type="submit">
-        For more information
-    </button>
-}*@
+    {
+        <button class="btn btn-secondary btn-block mt-md-2 disabled" type="button">
+            Voted
+        </button>
+    }
+    else
+    {
+        <button class="btn btn-primary btn-block mt-md-2" type="submit">
+            For more information
+        </button>
+    }*@
 @*<form class="mt-md-5" asp-controller="Candidates" asp-action="Index" method="post">
         <div class="form-group form-row justify-content-md-center">
             <div class="col-md-4 mb-3">

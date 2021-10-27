@@ -1,0 +1,363 @@
+﻿@using EVotingSystem.Models.Dashboard
+@using EVotingSystem.Models.Student
+@using EVotingSystem.Models.Candidate
+@using Highsoft.Web.Mvc.Charts
+@using Highsoft.Web.Mvc.Charts.Rendering
+@using System.Collections
+
+@model DashboardModel
+@{
+    ViewData["Title"] = "Dashboard Page";
+}
+<div class="jumbotron rounded-lg" style="min-height: 65vh">
+    <div class="container-fluid">
+        <div class="card bg-secondary">
+            <h3 class="card-header text-white">Statistics</h3>
+            <div class="card-body">
+                <div class="card-deck">
+                    <div class="card text-white bg-info mb-3">
+                        <div class="card-header">Total Registered Students</div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">@Model.TotalRegisteredStudents</h5>
+                        </div>
+                    </div>
+                    <div class="card text-white bg-info mb-3">
+                        <div class="card-header">Total Active Candidates</div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">@Model.TotalActiveCandidates</h5>
+                        </div>
+                    </div>
+                    <div class="card text-white bg-info mb-3">
+                        <div class="card-header">Total Votes</div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">@Model.TotalAttemptedVotes</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div id="StudentsChart" style="min-width: 300px; min-height: 250px;">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div id="CandidatesChart" style="min-width: 300px; min-height: 250px;">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div id="VotesChart" style="min-width: 300px; min-height: 250px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card bg-secondary mt-md-4">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h3 class="text-white">Students Manager</h3>
+                    </div>
+                    <div class="col-md-4 pt-md-2 ml-auto">
+                        <div class="input-group input-group-sm">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text fas fa-search" id="basic-addon1"></span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Search for student" aria-label="Search" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-scroll-bar table-light">
+                    <table class="table table-hover table-light">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Student Id</th>
+                                <th scope="col">First Name</th>
+                                <th scope="col">Last Name</th>
+                                <th scope="col">Gender</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Students.Count; i++)
+                            {
+                                StudentModel Student = Model.Students[i];
+                                <tr class="text-dark">
+                                    <th scope="row">@(i + 1)</th>
+                                    <td>@Student.StudentId</td>
+                                    <td>@Student.FirstName</td>
+                                    <td>@Student.LastName</td>
+                                    <td>@Student.Gender</td>
+                                    <td>@Student.Status</td>
+                                    <td>
+                                        <a asp-page="/Details" asp-route-id="@Student.StudentId">
+                                            <span aria-hidden="true" class="text-danger close">×</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card bg-secondary mt-md-4">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h3 class="text-white">Candidates Manager</h3>
+                    </div>
+                    <div class="col-md pt-md-2 ml-auto col-no-padding">
+                        <button type="button" class="btn btn-sm btn-success float-md-right" style="border-radius: 10px;">
+                            <i class="far fa-user pr-md-2" aria-hidden="true"></i>
+                            Add Candidate
+                        </button>
+                    </div>
+                    <div class="col-md pt-md-2 ml-auto">
+                        <div class="input-group input-group-sm">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text fas fa-search" id="basic-addon1"></span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Search for a candidate" aria-label="Search" aria-describedby="basic-addon1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-scroll-bar table-light">
+                    <table class="table table-hover table-light">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Id</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Gender</th>
+                                <th scope="col">Total Votes</th>
+                                <th scope="col">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Candidates.Count; i++)
+                            {
+                                CandidateModel Candidate = Model.Candidates[i];
+                                <tr class="text-dark">
+                                    <th scope="row">@(i + 1)</th>
+                                    <td>@Candidate.Id</td>
+                                    <td>@Candidate.Name</td>
+                                    <td>@Candidate.Gender</td>
+                                    <td>@(50 * i)</td>
+                                    <td>
+                                        <a asp-page="/Details" asp-route-id="@Candidate.Id">
+                                            <span aria-hidden="true" class="text-danger close">×</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        @{
+            Highcharts StudentChartOptions = new Highcharts
+            {
+                Chart = new Highsoft.Web.Mvc.Charts.Chart
+                {
+                    RenderTo = "StudentsChart",
+                    PlotBackgroundColor = null,
+                    PlotBorderWidth = null,
+                    PlotShadow = new Shadow
+                    {
+                        Enabled = false
+                    }
+                },
+                Credits = new Credits
+                {
+                    Enabled = false
+                },
+                Title = new Title
+                {
+                    Text = "Registered Students"
+                },
+                Tooltip = new Tooltip
+                {
+                    PointFormat = "'{series.name}: <b>{point.percentage:.0f}%</b>'"
+                },
+                Accessibility = new Accessibility
+                {
+                    Point = new AccessibilityPoint
+                    {
+                        ValueSuffix = "%"
+                    }
+                },
+                PlotOptions = new PlotOptions
+                {
+                    Pie = new PlotOptionsPie
+                    {
+                        AllowPointSelect = true,
+                        Cursor = PlotOptionsPieCursor.Pointer,
+                        DataLabels = new Hashtable
+                        {
+                            { "enabled", "true" },
+                            { "format", "<b>{point.name}</b>: {point.percentage:.0f}%" },
+                            { "crop", "true" },
+                            { "useHTML", "true" }
+                        },
+                        Size = "125"
+                    }
+                },
+                Series = new List<Series>
+                {
+                   new PieSeries
+                   {
+                       Name = "Students",
+                       Data = (List<PieSeriesData>)@ViewData["StudentPieData"]
+                   }
+                }
+            };
+            StudentChartOptions.Colors = new List<string>
+            {
+                "#32C1C7",
+                "#0F97BD"
+            };
+            StudentChartOptions.ID = "StudentsChart";
+            HighchartsRenderer StudentChartRenderer = new HighchartsRenderer(StudentChartOptions);
+            @Html.Raw(StudentChartRenderer.RenderHtml())
+        }
+        @{
+            Highcharts CandidateChartOptions = new Highcharts
+            {
+                Chart = new Highsoft.Web.Mvc.Charts.Chart
+                {
+                    RenderTo = "CandidatesChart",
+                    PlotBackgroundColor = null,
+                    PlotBorderWidth = null,
+                    PlotShadow = new Shadow
+                    {
+                        Enabled = false
+                    }
+                },
+                Credits = new Credits
+                {
+                    Enabled = false
+                },
+                Title = new Title
+                {
+                    Text = "Active Candidates"
+                },
+                Tooltip = new Tooltip
+                {
+                    PointFormat = "'{series.name}: <b>{point.percentage:.0f}%</b>'"
+                },
+                Accessibility = new Accessibility
+                {
+                    Point = new AccessibilityPoint
+                    {
+                        ValueSuffix = "%"
+                    }
+                },
+                PlotOptions = new PlotOptions
+                {
+                    Pie = new PlotOptionsPie
+                    {
+                        AllowPointSelect = true,
+                        Cursor = PlotOptionsPieCursor.Pointer,
+                        DataLabels = new Hashtable
+                        {
+                            { "enabled", "true" },
+                            { "format", "<b>{point.name}</b>: {point.percentage:.0f}%" },
+                            { "crop", "true" },
+                            { "useHTML", "true" }
+                        },
+                        Size = "125"
+                    }
+                },
+                Series = new List<Series>
+                {
+                   new PieSeries
+                   {
+                       Name = "Candidates",
+                       Data = (List<PieSeriesData>)@ViewData["CandidatePieData"]
+                   }
+                }
+            };
+            CandidateChartOptions.Colors = new List<string>
+            {
+                "#32C1C7",
+                "#0F97BD"
+            };
+            CandidateChartOptions.ID = "CandidatesChart";
+            HighchartsRenderer CandidateChartRenderer = new HighchartsRenderer(CandidateChartOptions);
+            @Html.Raw(CandidateChartRenderer.RenderHtml())
+        }
+        @{
+            Highcharts CandidateVoteChartOptions = new Highcharts
+            {
+                Chart = new Highsoft.Web.Mvc.Charts.Chart
+                {
+                    RenderTo = "VotesChart",
+                    PlotBackgroundColor = null,
+                    PlotBorderWidth = null,
+                    PlotShadow = new Shadow
+                    {
+                        Enabled = false
+                    }
+                },
+                Credits = new Credits
+                {
+                    Enabled = false
+                },
+                Title = new Title
+                {
+                    Text = "Total Attempted Votes"
+                },
+                Tooltip = new Tooltip
+                {
+                    PointFormat = "'{series.name}: <b>{point.percentage:.0f}%</b>'"
+                },
+                Accessibility = new Accessibility
+                {
+                    Point = new AccessibilityPoint
+                    {
+                        ValueSuffix = "%"
+                    }
+                },
+                PlotOptions = new PlotOptions
+                {
+                    Pie = new PlotOptionsPie
+                    {
+                        AllowPointSelect = true,
+                        Cursor = PlotOptionsPieCursor.Pointer,
+                        DataLabels = new Hashtable
+                        {
+                            { "enabled", "true" },
+                            { "format", "<b>{point.name}</b>: {point.percentage:.0f}%" },
+                            { "crop", "true" },
+                            { "useHTML", "true" }
+                        },
+                        Size = "125"
+                    }
+                },
+                Series = new List<Series>
+                {
+                   new PieSeries
+                   {
+                       Name = "Votes",
+                       Data = (List<PieSeriesData>)@ViewData["CandidateVotesPieData"]
+                   }
+                }
+            };
+            CandidateVoteChartOptions.Colors = new List<string>
+            {
+                "#32C1C7",
+                "#0F97BD"
+            };
+            CandidateVoteChartOptions.ID = "VotesChart";
+            HighchartsRenderer CandidateVoteChartRenderer = new HighchartsRenderer(CandidateVoteChartOptions);
+            @Html.Raw(CandidateVoteChartRenderer.RenderHtml())
+        }
+    </div>
+</div>

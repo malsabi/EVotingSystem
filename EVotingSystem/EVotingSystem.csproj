@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Cloud.Firestore" Version="2.4.0" />
+    <PackageReference Include="Highsoft.Highcharts" Version="9.2.2.1" />
     <PackageReference Include="Twilio" Version="5.65.3" />
   </ItemGroup>
 

@@ -1,6 +1,6 @@
 ﻿using EVotingSystem.DataBase;
 using EVotingSystem.Helpers;
-using EVotingSystem.Models;
+using EVotingSystem.Models.Candidate;
 using EVotingSystem.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
