@@ -113,3 +113,10 @@ body {
     overflow: scroll;
 }
 /*END OF DASHBOARD STYLES*/
+
+/*START OF LOGIN STYLES*/
+.HideToken
+{
+    display: none !important;
+}
+/*END OF LOGIN STYLES*/

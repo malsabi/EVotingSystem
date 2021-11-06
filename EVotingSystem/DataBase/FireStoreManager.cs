@@ -581,15 +581,15 @@ namespace EVotingSystem.DataBase
         /// Changes the status of the admin to online, and updates the StaySignedIn depending on the user.
         /// </summary>
         /// <param name="AccessPanel">Represents the access panel model</param>
-        public async void LoginAdmin(AccessPanelModel AccessPanel)
+        public async void LoginAdmin(LoginModel Login)
         {
             try
             {
-                DocumentReference Document = FireStoreDataBase.Collection(Config.AdminPath).Document(AccessPanel.Email);
+                DocumentReference Document = FireStoreDataBase.Collection(Config.AdminPath).Document(Login.Email);
                 Dictionary<string, object> Fields = new Dictionary<string, object>
                 {
                     { "Status", Config.AdminOnline },
-                    { "StaySignedIn", AccessPanel.StaySignedIn }
+                    { "StaySignedIn", Login.StaySignedIn }
                 };
                 await Document.UpdateAsync(Fields);
             }

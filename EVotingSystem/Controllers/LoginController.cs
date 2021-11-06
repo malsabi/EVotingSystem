@@ -1,10 +1,13 @@
 ﻿using EVotingSystem.Constants;
 using EVotingSystem.DataBase;
 using EVotingSystem.Helpers;
+using EVotingSystem.Models.Admin;
 using EVotingSystem.Models.Identity;
 using EVotingSystem.Models.Student;
 using EVotingSystem.Utilities;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace EVotingSystem.Controllers
 {
@@ -38,7 +41,7 @@ namespace EVotingSystem.Controllers
         [HttpGet]
         public IActionResult Recover()
         {
-            if (Identity.IsStudentLoggedIn())
+            if (Identity.IsStudentLoggedIn() || Identity.IsAdminLoggedIn())
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -55,47 +58,82 @@ namespace EVotingSystem.Controllers
         {
             Login.EncryptProperties();
 
-            if (Identity.IsStudentLoggedIn())
+            if (Identity.IsStudentLoggedIn() || Identity.IsAdminLoggedIn())
             {
                 return RedirectToPage("Index", "Home");
             }
             else
             {
-                if (ModelState.IsValid)
+                switch (Login.AccountType)
                 {
-                    if (FireStore.IsStudentRegistered(Login.StudentId).Result == false)
-                    {
-                        return Json(new { State = "Error" });
-                    }
-                    else if (FireStore.IsStudentOnline(Login.StudentId).Result == true)
-                    {
-                        return Json(new { State = "ErrorActive" });
-                    }
-                    else
-                    {
-                        StudentModel Student = FireStore.GetStudent(Login.StudentId).Result;
-
-                        if (Student.Password.Equals(Login.Password))
+                    case "Student":
                         {
-                            Student.DecryptProperties();
-
-                            string ConfirmationCode = DeviceHelper.GetVerificationCode(Config.ConfirmCodeLength);
-
-                            VerificationHelper.SendCode(Student.FirstName, Student.LastName, Student.Email, ConfirmationCode);
-
-                            Identity.SetConfirmationCode(ConfirmationCode);
-
-                            return Json(new { State = "Valid", ConfirmationCode });
+                            if (ModelState["StudentId"].Errors.Count() > 0)
+                            {
+                                return Json(new { State = "Invalid" });
+                            }
+                            else
+                            {
+                                if (FireStore.IsStudentRegistered(Login.StudentId).Result == false)
+                                {
+                                    return Json(new { State = "Error" });
+                                }
+                                else if (FireStore.IsStudentOnline(Login.StudentId).Result == true)
+                                {
+                                    return Json(new { State = "ErrorActive" });
+                                }
+                                else
+                                {
+                                    StudentModel Student = FireStore.GetStudent(Login.StudentId).Result;
+                                    if (Student.Password.Equals(Login.Password))
+                                    {
+                                        Student.DecryptProperties();
+                                        string ConfirmationCode = DeviceHelper.GetVerificationCode(Config.ConfirmCodeLength);
+                                        VerificationHelper.SendCode(Student.FirstName, Student.LastName, Student.Email, ConfirmationCode);
+                                        Identity.SetConfirmationCode(ConfirmationCode);
+                                        return Json(new { State = "Valid", ConfirmationCode });
+                                    }
+                                    else
+                                    {
+                                        return Json(new { State = "ErrorPassword" });
+                                    }
+                                }
+                            }
                         }
-                        else
+                    case "Administrator":
                         {
-                            return Json(new { State = "ErrorPassword" });
+                            if (ModelState["Email"].Errors.Count() > 0)
+                            {
+                                return Json(new { State = "Invalid" });
+                            }
+                            else
+                            {
+                                if (FireStore.IsAdminRegistered(Login.Email).Result == false)
+                                {
+                                    return Json(new { State = "Error" });
+                                }
+                                else if (FireStore.IsAdminOnline(Login.Email).Result == true)
+                                {
+                                    return Json(new { State = "ErrorActive" });
+                                }
+                                else
+                                {
+                                    AdminModel Admin = FireStore.GetAdmin(Login.Email).Result;
+                                    if (Admin.Password.Equals(Login.Password))
+                                    {
+                                        FireStore.LoginAdmin(Login);
+                                        Identity.LoginAdmin(Login);
+                                        return Json(new { State = "Success", Login });
+                                    }
+                                    else
+                                    {
+                                        return Json(new { State = "ErrorPassword" });
+                                    }
+                                }
+                            }
                         }
-                    }
-                }
-                else
-                {
-                    return Json(new { State = "Invalid" });
+                    default:
+                        return Json(new { State = "Invalid" });
                 }
             }
         }
@@ -105,7 +143,7 @@ namespace EVotingSystem.Controllers
         {
             Login.EncryptProperties();
 
-            if (Identity.IsStudentLoggedIn())
+            if (Identity.IsStudentLoggedIn() || Identity.IsAdminLoggedIn())
             {
                 return RedirectToPage("Index", "Home");
             }
@@ -142,7 +180,7 @@ namespace EVotingSystem.Controllers
         [HttpPost]
         public IActionResult Recover(RecoverModel model)
         {
-            if (Identity.IsStudentLoggedIn())
+            if (Identity.IsStudentLoggedIn() || Identity.IsAdminLoggedIn())
             {
                 return RedirectToPage("Index", "Home");
             }

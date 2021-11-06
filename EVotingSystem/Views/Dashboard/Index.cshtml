@@ -9,6 +9,7 @@
 @{
     ViewData["Title"] = "Dashboard Page";
 }
+
 <div class="jumbotron rounded-lg" style="min-height: 65vh">
     <div class="container-fluid">
         <div class="card bg-secondary">
@@ -59,16 +60,16 @@
                     <div class="col-md-4 pt-md-2 ml-auto">
                         <div class="input-group input-group-sm">
                             <div class="input-group-prepend">
-                                <span class="input-group-text fas fa-search" id="basic-addon1"></span>
+                                <span class="input-group-text fas fa-search" id="StudentAddOn"></span>
                             </div>
-                            <input type="text" class="form-control" placeholder="Search for student" aria-label="Search" aria-describedby="basic-addon1">
+                            <input id="StudentSearch" type="text" class="form-control" placeholder="Search for student" aria-label="Search" aria-describedby="StudentAddOn">
                         </div>
                     </div>
                 </div>
             </div>
             <div class="card-body">
                 <div class="table-scroll-bar table-light">
-                    <table class="table table-hover table-light">
+                    <table class="table table-hover table-light" id="StudentTable">
                         <thead class="thead-light">
                             <tr>
                                 <th scope="col">#</th>
@@ -76,7 +77,7 @@
                                 <th scope="col">First Name</th>
                                 <th scope="col">Last Name</th>
                                 <th scope="col">Gender</th>
-                                <th scope="col">Status</th>
+                                <th scope="col">Votes Applied</th>
                                 <th scope="col">Delete</th>
                             </tr>
                         </thead>
@@ -90,11 +91,11 @@
                                     <td>@Student.FirstName</td>
                                     <td>@Student.LastName</td>
                                     <td>@Student.Gender</td>
-                                    <td>@Student.Status</td>
+                                    <td>@Student.TotalVotesApplied</td>
                                     <td>
-                                        <a asp-page="/Details" asp-route-id="@Student.StudentId">
-                                            <span aria-hidden="true" class="text-danger close">×</span>
-                                        </a>
+                                        <button type="button" class="close" onClick="DeleteStudentConfirmation('@Student.StudentId');">
+                                            <span aria-hidden="true" class="text-danger">&times;</span>
+                                        </button>
                                     </td>
                                 </tr>
                             }
@@ -102,6 +103,31 @@
                     </table>
                 </div>
             </div>
+            <!--Start of Student Confirmation modal-->
+            <div class="modal fade" id="DeleteStudentConfirmation" tabindex="-1" role="dialog" aria-labelledby="ConfirmationModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="ConfirmationModalLabel">Delete Student Confirmation</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete the student ?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">
+                                Close
+                            </button>
+                            <button id="DeleteStudentButton" type="submit" class="btn btn-primary btn-lg d-block">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--End of Student Confirmation modal-->
         </div>
         <div class="card bg-secondary mt-md-4">
             <div class="card-header">
@@ -118,16 +144,16 @@
                     <div class="col-md pt-md-2 ml-auto">
                         <div class="input-group input-group-sm">
                             <div class="input-group-prepend">
-                                <span class="input-group-text fas fa-search" id="basic-addon1"></span>
+                                <span class="input-group-text fas fa-search" id="CandidateAddOn"></span>
                             </div>
-                            <input type="text" class="form-control" placeholder="Search for a candidate" aria-label="Search" aria-describedby="basic-addon1">
+                            <input id="CandidateSearch" type="text" class="form-control" placeholder="Search for a candidate" aria-label="Search" aria-describedby="CandidateAddOn">
                         </div>
                     </div>
                 </div>
             </div>
             <div class="card-body">
                 <div class="table-scroll-bar table-light">
-                    <table class="table table-hover table-light">
+                    <table class="table table-hover table-light" id="CandidateTable">
                         <thead class="thead-light">
                             <tr>
                                 <th scope="col">#</th>
@@ -149,9 +175,9 @@
                                     <td>@Candidate.Gender</td>
                                     <td>@(50 * i)</td>
                                     <td>
-                                        <a asp-page="/Details" asp-route-id="@Candidate.Id">
-                                            <span aria-hidden="true" class="text-danger close">×</span>
-                                        </a>
+                                        <button type="button" class="close" onClick="DeleteCandidate('@Candidate.Id');">
+                                            <span aria-hidden="true" class="text-danger">&times;</span>
+                                        </button>
                                     </td>
                                 </tr>
                             }
@@ -159,8 +185,32 @@
                     </table>
                 </div>
             </div>
+            <!--Start of Candidate Confirmation modal-->
+            <div class="modal fade" id="DeleteCandidateConfirmation" tabindex="-1" role="dialog" aria-labelledby="ConfirmationModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="ConfirmationModalLabel">Delete Candidate Confirmation</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete the Candidate ?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">
+                                Close
+                            </button>
+                            <button id="DeleteCandidateButton" type="submit" class="btn btn-primary btn-lg d-block">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--End of Candidate Confirmation modal-->
         </div>
-
         @{
             Highcharts StudentChartOptions = new Highcharts
             {

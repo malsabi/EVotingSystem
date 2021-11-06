@@ -16,6 +16,7 @@ namespace EVotingSystem.Controllers
 
         public HomeController()
         {
+            Logger.Logger.Log(Logger.LogLevel.Get, null);
             FireStore = new FireStoreManager();
             Identity = new IdentityHandler(this);
         }

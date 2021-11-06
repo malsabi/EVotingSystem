@@ -130,21 +130,24 @@ namespace EVotingSystem.Utilities
         }
         public static bool IsCandidateVoted(CandidateModel Candidate, StudentModel Student)
         {
-            Candidate.EncryptProperties();
-            CandidateVoteModel CandidateVote = new FireStoreManager().GetCandidateVote(Candidate.Id).Result;
-            Candidate.DecryptProperties();
-            if (CandidateVote.StudentVoteCollection == null)
+            if (Student == null || Candidate == null)
             {
                 return false;
             }
             else
             {
-                if (CandidateVote.StudentVoteCollection.Any(cv => cv.Id.Equals(Student.StudentId)))
+                Candidate.EncryptProperties();
+                CandidateVoteModel CandidateVote = new FireStoreManager().GetCandidateVote(Candidate.Id).Result;
+                Candidate.DecryptProperties();
+                if (CandidateVote.StudentVoteCollection != null)
                 {
-                    return true;
+                    if (CandidateVote.StudentVoteCollection.Any(cv => cv.Id.Equals(Student.StudentId)))
+                    {
+                        return true;
+                    }
                 }
-                return false;
             }
+            return false;
         }
         #endregion
     }

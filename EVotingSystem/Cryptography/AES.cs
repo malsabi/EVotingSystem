@@ -9,17 +9,20 @@ namespace EVotingSystem.Cryptography
     {
         #region Settings
 
-        private static int _iterations = 2;
-        private static int _keySize = 256;
-
-        private static string _hash = "SHA1";
-        private static string _salt = "aselrias38490a32"; // Random
-        private static string _vector = "8947az34awl34kjq"; // Random
+        private static readonly int _iterations = 2;
+        private static readonly int _keySize = 256;
+        private static readonly string _hash = "SHA1";
+        private static readonly string _salt = "aselrias38490a32";
+        private static readonly string _vector = "8947az34awl34kjq";
         #endregion
 
         public static string Encrypt(string value, string password)
         {
             return Encrypt<AesManaged>(value, password);
+        }
+        public static string Decrypt(string value, string password)
+        {
+            return Decrypt<AesManaged>(value, password);
         }
 
         public static byte[] GetBytes(string Value)
@@ -56,11 +59,6 @@ namespace EVotingSystem.Cryptography
                 cipher.Clear();
             }
             return Convert.ToBase64String(encrypted);
-        }
-
-        public static string Decrypt(string value, string password)
-        {
-            return Decrypt<AesManaged>(value, password);
         }
 
         public static string Decrypt<T>(string value, string password) where T : SymmetricAlgorithm, new()
@@ -102,6 +100,5 @@ namespace EVotingSystem.Cryptography
             }
             return Encoding.UTF8.GetString(decrypted, 0, decryptedByteCount);
         }
-
     }
 }

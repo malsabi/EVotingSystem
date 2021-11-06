@@ -21,7 +21,7 @@ namespace EVotingSystem.Models.Student
         public void DecryptProperties()
         {
             this.Id     = StudentHelper.DecryptField(this.Id);
-            this.Gender = StudentHelper.DecryptField(this.Id);
+            this.Gender = StudentHelper.DecryptField(this.Gender);
         }
     }
 }

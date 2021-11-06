@@ -6,7 +6,7 @@
 <div class="jumbotron rounded-lg" style="min-height: 65vh">
     <div class="container-fluid">
         <h1 class="text-uppercase text-center">Sign Up</h1>
-        <form class="mt-md-5" asp-controller="SignUp" asp-action="Index" method="post" id="SignUpForm">
+        <form class="mt-md-5" asp-controller="SignUp" asp-action="Index" method="post" id="SignUpForm" autocomplete="off">
             <div class="form-group form-row justify-content-md-center">
                 <div class="col-md-4 mb-3">
                     <label asp-for="FirstName" for="FirstNameTextBox">First Name</label>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label asp-for="Password" for="PasswordTextBox">Password</label>
-                    <input asp-for="Password" type="password" class="form-control" id="PasswordTextBox" placeholder="Enter your Password">
+                    <input asp-for="Password" type="password" class="form-control" id="PasswordTextBox" placeholder="Enter your Password" autocomplete="off">
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
             </div>
@@ -51,8 +51,11 @@
                     <span asp-validation-for="Phone" class="text-danger"></span>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label asp-for="Gender" for="GenderTextBox">Gender</label>
-                    <input asp-for="Gender" type="text" class="form-control" id="GenderTextBox" placeholder="Enter your Gender">
+                    <label asp-for="Gender" for="GenderComboBox">Gender</label>
+                    <select asp-for="Gender" class="form-control" id="GenderComboBox">
+                        <option>Male</option>
+                        <option>Female</option>
+                    </select>
                     <span asp-validation-for="Gender" class="text-danger"></span>
                 </div>
             </div>

@@ -10,7 +10,7 @@ namespace EVotingSystem.Controllers
         #endregion
 
         public ProfileController()
-        {
+        { 
             Identity = new IdentityHandler(this);
         }
 

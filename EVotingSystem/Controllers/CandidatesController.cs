@@ -28,11 +28,7 @@ namespace EVotingSystem.Controllers
         {
             if (Identity.IsAdminLoggedOut())
             {
-                List<CandidateModel> Candidates = FireStore.GetAllCandidates().Result;
-                foreach (CandidateModel C in Candidates)
-                {
-                    C.DecryptProperties();
-                }
+                List<CandidateModel> Candidates = FireStore.GetAllCandidates(true).Result;
                 return View(Candidates.ToArray());
             }
             else
@@ -65,18 +61,8 @@ namespace EVotingSystem.Controllers
         [HttpPost]
         public IActionResult Attempt(CandidateModel Candidate)
         {
-            //string[] Elements = Request.Form[Candidate.Id].ToArray();
-
-            //Handle Voting/UnVoting
-            if (this.Candidate.ApplyVote(Identity.StudentSession(), Candidate))
-            {
-                //Handle Success-Popup Message
-            }
-            else
-            {
-                //Handle Error-Popup Message
-            }
-            //Redirect to the candidate view after handling the voting/unvoting.
+            this.Candidate.ApplyVote(Identity.StudentSession(), Candidate);
+            //Redirect to the candidate view after handling the voting.
             return RedirectToAction("Index", "Candidates");
         }
         #endregion

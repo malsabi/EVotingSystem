@@ -1,42 +1,35 @@
 ﻿//Helper Function takes a character parameter and returns
 //True: if the character is a digit between 0 and 9
 //False: if the character is a non digit.
-function IsDigit(c)
-{
+function IsDigit(c) {
     return (c >= '0' && c <= '9');
 }
 
 //Helper Function takes a character parameter and returns
 //True: if the character is a letter betweeen A-Z/a-z
 //False: if the character is a non letter.
-function IsLetter(c)
-{
+function IsLetter(c) {
     return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'));
 }
 
 //Helper Function takes two parameter, first the path represents the rout
 //second is interval represents delay in milliseconds, 1000ms = 1s.
-function Redirect(Path, Interval)
-{
-    window.setTimeout(function ()
-    {
+function Redirect(Path, Interval) {
+    window.setTimeout(function () {
         window.location.href = Path;
     }, Interval);
 }
 
 //Helper Function takes one parameter that represents the Id of the modal.
 //The function hides the modal.
-function HideModal(Id)
-{
+function HideModal(Id) {
     $(Id).modal('hide');
 }
 
 //Helper Function that resets all of the inputs from the sign up
-function ResetSignUp()
-{
+function ResetSignUp() {
     let SignUpForm = document.getElementById('SignUpForm');
-    if (SignUpForm != null)
-    {
+    if (SignUpForm != null) {
         document.getElementById('FirstNameTextBox').value = '';
         document.getElementById('LastNameTextBox').value = '';
         document.getElementById('StudentIdTextBox').value = '';
@@ -49,8 +42,7 @@ function ResetSignUp()
 
 //Helper Function takes two parameters, that represents the Id of the Control, Content of the Control.
 //The function adds a spinner code and changes the text.
-function ShowSpinner(Id, Content)
-{
+function ShowSpinner(Id, Content) {
     console.log('Starting ShowSpinner Function');
     let Button = document.getElementById(Id);
     //Disable Button
@@ -63,8 +55,7 @@ function ShowSpinner(Id, Content)
 
 //Helper Function takes two parameters, that represents the Id of the Control, Content of the Control.
 //The function removes the spinner code and changes the text.
-function HideSpinner(Id, Content)
-{
+function HideSpinner(Id, Content) {
     let Button = document.getElementById(Id);
     //Enable Button
     Button.removeAttribute("disabled");
@@ -73,18 +64,13 @@ function HideSpinner(Id, Content)
 }
 
 //Add the Name Validation that is hooked with the server side validation.
-jQuery.validator.addMethod('NameValidation', function (value, element)
-{
-    if (value == null || value.length == 0)
-    {
+jQuery.validator.addMethod('NameValidation', function (value, element) {
+    if (value == null || value.length == 0) {
         return false;
     }
-    else
-    {
-        for (var i = 0; i < value.length; i++)
-        {
-            if (IsLetter(value[i]) == false)
-            {
+    else {
+        for (var i = 0; i < value.length; i++) {
+            if (IsLetter(value[i]) == false) {
                 return false;
             }
         }
@@ -95,26 +81,19 @@ $.validator.unobtrusive.adapters.addBool("NameValidation");
 
 
 //Add the StudentId Validation that is hooked with the server side validation.
-jQuery.validator.addMethod('StudentIdValidation', function (value, element)
-{
-    if (value == null || value.length != 9)
-    {
+jQuery.validator.addMethod('StudentIdValidation', function (value, element) {
+    if (value == null || value.length != 9) {
         return false;
     }
-    else
-    {
-        if ((value[0] == 'H') || (value[0] == 'h'))
-        {
-            for (var i = 1; i < value.length; i++)
-            {
-                if (IsDigit(value[i]) == false)
-                {
+    else {
+        if ((value[0] == 'H') || (value[0] == 'h')) {
+            for (var i = 1; i < value.length; i++) {
+                if (IsDigit(value[i]) == false) {
                     return false;
                 }
             }
         }
-        else
-        {
+        else {
             return false;
         }
     }
@@ -123,43 +102,32 @@ jQuery.validator.addMethod('StudentIdValidation', function (value, element)
 $.validator.unobtrusive.adapters.addBool("StudentIdValidation");
 
 //Add the EmailValidation that is hooked with the server side validation.
-jQuery.validator.addMethod('EmailValidation', function (value, element)
-{
+jQuery.validator.addMethod('EmailValidation', function (value, element) {
     const Domain = "hct.ac.ae";
     const IdLength = 9;
 
-    if (value == null || value.includes("@") == false)
-    {
+    if (value == null || value.includes("@") == false) {
         return false;
     }
-    else
-    {
+    else {
         const Parts = value.split("@");
-        if (Parts.length != 2)
-        {
+        if (Parts.length != 2) {
             return false;
         }
-        else
-        {
+        else {
             let CurrentId = Parts[0];
             let CurrentDomain = Parts[1];
 
-            if (CurrentDomain != Domain || CurrentId.length != IdLength)
-            {
+            if (CurrentDomain != Domain || CurrentId.length != IdLength) {
                 return false;
             }
-            else
-            {
-                if (CurrentId[0] != 'H' && CurrentId[0] != 'h')
-                {
+            else {
+                if (CurrentId[0] != 'H' && CurrentId[0] != 'h') {
                     return false;
                 }
-                else
-                {
-                    for (var i = 1; i < CurrentId.length; i++)
-                    {
-                        if (IsDigit(CurrentId[i]) == false)
-                        {
+                else {
+                    for (var i = 1; i < CurrentId.length; i++) {
+                        if (IsDigit(CurrentId[i]) == false) {
                             return false;
                         }
                     }
@@ -171,21 +139,59 @@ jQuery.validator.addMethod('EmailValidation', function (value, element)
 });
 $.validator.unobtrusive.adapters.addBool("EmailValidation");
 
+//Add the GenderValidation that is hooked with the server side validation.
+jQuery.validator.addMethod('GenderValidation', function (value, element) {
+
+    let Gender = String(value).toLowerCase();
+    if (Gender == null || (Gender != "male" && Gender != "female")) {
+        return false;
+    }
+    return true;
+});
+$.validator.unobtrusive.adapters.addBool("GenderValidation");
+
+//Add the NationalIdValidation that is hooked with the server side validation.
+jQuery.validator.addMethod('NationalIdValidation', function (value, element) {
+
+    let NationalId = String(value);
+    if (NationalId == null || NationalId.length != 18 || NationalId.includes("-") == false) {
+        return false;
+    }
+    else {
+        const Parts = NationalId.split("-");
+        if (Parts.length != 4) {
+            return false;
+        }
+        else {
+            if (Parts[0].length != 3 || Parts[1].length != 4 || Parts[2].length != 7 || Parts[3].length != 1) {
+                return false;
+            }
+            else {
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 0; j < Parts[i].length; j++) {
+                        if (IsDigit(Parts[i][j]) == false) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return true;
+});
+$.validator.unobtrusive.adapters.addBool("NationalIdValidation");
+
 //Handle the "Back to main page" Button
-$(document).ready(function ()
-{
-    $('#BackToMainButton').on('click', e =>
-    {
+$(document).ready(function () {
+    $('#BackToMainButton').on('click', e => {
         Redirect('/', 1000);
     });
 });
 
 //Handle the Modal when it is hidden => an event will be raised and the data will be cleared
-$(document).ready(function ()
-{
+$(document).ready(function () {
     //Modal event when it is hidden it will be raised.
-    $('.modal').on('hidden.bs.modal', function (e)
-    {
+    $('#ConfirmationModal').on('hidden.bs.modal', function (e) {
         document.getElementById('ConfirmationResult').textContent = '';
         document.getElementById('CodeTextBox').value = '';
     });
@@ -194,8 +200,7 @@ $(document).ready(function ()
 //When the document (page) is ready and loaded, it will do the following:
 //1. It will attempt to clear the sign up form.
 //2. It will attempt to hide the modal.
-$(document).ready(function ()
-{
+$(document).ready(function () {
     ResetSignUp();
     HideModal('#ConfirmationModal');
 });
@@ -203,20 +208,16 @@ $(document).ready(function ()
 //When the document (page) is ready and loaded, it will do the following:
 //1. Handle the Vote button click
 //2. If the user clicks "YES" it will attempt the vote, otherwise it will just close the modal.
-$(document).ready(function ()
-{
-    $("#VoteButton").on('click', e =>
-    {
+$(document).ready(function () {
+    $("#VoteButton").on('click', e => {
         console.log("VoteButton Clicked");
         $('#VoteConfirmationModal').modal('show');
     });
 });
 
 //Handle the Sign Up Register Button POST's request using AJAX
-$(document).ready(function ()
-{
-    $("#SignUpButton").on('click', e =>
-    {
+$(document).ready(function () {
+    $("#SignUpButton").on('click', e => {
         e.preventDefault();
 
         let SignUpResultButton = document.getElementById('SignUpResult');
@@ -224,90 +225,118 @@ $(document).ready(function ()
 
         $("#SignUpForm").validate();
 
-        if ($("#SignUpForm").valid())
-        {
+        if ($("#SignUpForm").valid()) {
             ShowSpinner("SignUpButton", "Register");
             $.ajax
-            ({
-                type: "POST",
-                url: 'SignUp?',
-                data: $("#SignUpForm").serialize(),
-                dataType: "json",
-                success: function (response)
-                {
-                    HideSpinner("SignUpButton", "Register");
-                    if (response != null)
-                    {
-                        console.log(response);
+                ({
+                    type: "POST",
+                    url: 'SignUp?',
+                    data: $("#SignUpForm").serialize(),
+                    dataType: "json",
+                    success: function (response) {
+                        HideSpinner("SignUpButton", "Register");
+                        if (response != null) {
+                            console.log(response);
 
-                        if (response.state === 'Valid') {
-                            $('#ConfirmationModal').modal('show');
-                            SignUpResultButton.textContent = '';
+                            if (response.state === 'Valid') {
+                                $('#ConfirmationModal').modal('show');
+                                SignUpResultButton.textContent = '';
+                            }
+                            else {
+                                SignUpResultButton.textContent = 'The Account is already registered.';
+                            }
                         }
                         else {
-                            SignUpResultButton.textContent = 'The Account is already registered.';
+                            SignUpResultButton.textContent = 'No response from the server.';
                         }
                     }
-                    else
-                    {
-                        SignUpResultButton.textContent = 'No response from the server.';
-                    }
-                }
-            });
+                });
         }
-        else
-        {
+        else {
             SignUpResultButton.textContent = 'Invalid data, please insert a valid data';
-        } 
+        }
     });
 });
 
 //Handle the Sign Up Confirmation Button POST's request using AJAX
 $(document).ready(function () {
-    $("#SubmitCodeButton").on('click', e =>
-    {
+    $("#SubmitCodeButton").on('click', e => {
         e.preventDefault();
         ShowSpinner('SubmitCodeButton', 'Submit');
         $.ajax
-        ({
-            type: "POST",
-            url: 'SignUp/Check',
-            data: $("#SignUpForm").serialize(),
-            dataType: "json",
-            success: function (response)
-            {
-                if (response != null)
-                {
-                    console.log(response);
-                    let ConfirmationResult = document.getElementById('ConfirmationResult');
-                    if (response.state === 'Failed')
-                    {
-                        HideSpinner('SubmitCodeButton', 'Submit');
-                        ConfirmationResult.classList.replace("text-success", "text-danger");
-                        ConfirmationResult.textContent = 'Invalid Confirmation Code';
-                    }
-                    else
-                    {
-                        ConfirmationResult.classList.replace("text-danger", "text-success");
-                        ConfirmationResult.textContent = 'Redirection..';
-                        window.setTimeout(function ()
-                        {
+            ({
+                type: "POST",
+                url: 'SignUp/Check',
+                data: $("#SignUpForm").serialize(),
+                dataType: "json",
+                success: function (response) {
+                    if (response != null) {
+                        console.log(response);
+                        let ConfirmationResult = document.getElementById('ConfirmationResult');
+                        if (response.state === 'Failed') {
                             HideSpinner('SubmitCodeButton', 'Submit');
-                            Redirect('/SignUp/Successful', 1000);
-                            HideModal('#ConfirmationModal');
-                        }, 2500);
+                            ConfirmationResult.classList.replace("text-success", "text-danger");
+                            ConfirmationResult.textContent = 'Invalid Confirmation Code';
+                        }
+                        else {
+                            ConfirmationResult.classList.replace("text-danger", "text-success");
+                            ConfirmationResult.textContent = 'Redirection..';
+                            window.setTimeout(function () {
+                                HideSpinner('SubmitCodeButton', 'Submit');
+                                Redirect('/SignUp/Successful', 1000);
+                                HideModal('#ConfirmationModal');
+                            }, 2500);
+                        }
                     }
                 }
-            }
-        });
+            });
     });
 });
 
+//Handles the Account type chosen by the client
+$(document).ready(function () {
+    $('#AccountTypeComboBox').on('change', function () {
+        document.getElementById("StudentIdTextBox").value = "";
+        document.getElementById("AdminEmailTextBox").value = "";
+        if ($(this).val() == "Student") {
+            if ($("#AdminEmailRow").hasClass("HideToken") == false) {
+                //Hide Admin Email and Remove Validation Attributes
+                $("#AdminEmailRow").addClass("HideToken");
+                $("#AdminEmailTextBox").removeAttr('data-val-required');
+                $("#AdminEmailTextBox").removeAttr('data-val-maxlength');
+            }
+            //Add Validation Attributes to the Student Id
+            $("#StudentIdTextBox").attr('data-val-required', 'Please insert your Student Id');
+            $("#StudentIdTextBox").attr('data-val-maxlength', 'Student Id cannot exceed more than 9 characters');
+            $("#StudentIdTextBox").attr('data-val-studentidvalidation', 'Invalid Student Id, please insert a valid HCT Id');
+
+            //Remove Hidden Tags from Recovery Link and Student Id
+            $('#RecoverLink').removeClass("HideToken");
+            $("#StudentIdRow").removeClass("HideToken");
+            $("#StudentIdRow").show();
+        }
+        else if ($(this).val() == "Administrator") {
+            if ($("#StudentIdRow").hasClass("HideToken") == false) {
+                //Hide Student Id and Remove Validation Attributes
+                $("#StudentIdRow").addClass("HideToken");
+                $('#RecoverLink').addClass("HideToken");
+                $("#StudentIdTextBox").removeAttr('data-val-required');
+                $("#StudentIdTextBox").removeAttr('data-val-maxlength');
+                $("#StudentIdTextBox").removeAttr('data-val-studentidvalidation');
+            }
+            //Add Validation Attributes to the Admin Email
+            $("#AdminEmailTextBox").attr('data-val-required', 'Please insert your Email');
+            $("#AdminEmailTextBox").attr('data-val-maxlength', 'Email cannot exceed more than 30 characters');
+            //Remove Hidden Tags from Admin Email
+            $("#AdminEmailRow").removeClass("HideToken");
+            $("#AdminEmailRow").show();
+        }
+    });
+});
 
 //Handle the Login Button POST's request using AJAX
 $(document).ready(function () {
-    $("#LoginButton").on('click', e =>
-    {
+    $("#LoginButton").on('click', e => {
         e.preventDefault();
 
         let LoginResult = document.getElementById('LoginResult');
@@ -315,8 +344,7 @@ $(document).ready(function () {
 
         $("#LoginForm").validate();
 
-        if ($("#LoginForm").valid())
-        {
+        if ($("#LoginForm").valid()) {
             ShowSpinner("LoginButton", "Submit");
             $.ajax
                 ({
@@ -324,141 +352,149 @@ $(document).ready(function () {
                     url: 'Login?',
                     data: $("#LoginForm").serialize(),
                     dataType: "json",
-                    success: function (response)
-                    {
-                        HideSpinner("LoginButton", "Submit");
-                        if (response != null)
-                        {
+                    success: function (response) {
+                      
+                        if (response != null) {
                             console.log(response);
 
                             if (response.state === 'Valid') {
                                 $('#ConfirmationModal').modal('show');
                                 LoginResult.textContent = '';
+                                HideSpinner("LoginButton", "Submit");
                             }
                             else if (response.state === 'ErrorPassword') {
                                 LoginResult.textContent = 'Invalid Password, please enter a valid password.';
+                                HideSpinner("LoginButton", "Submit");
                             }
                             else if (response.state === 'ErrorActive') {
                                 LoginResult.textContent = 'You are already signed in.';
+                                HideSpinner("LoginButton", "Submit");
+                            }
+                            else if (response.state === 'Success') {
+                                ConfirmationResult.classList.replace("text-danger", "text-success");
+                                ConfirmationResult.textContent = 'Redirection..';
+                                window.setTimeout(function () {
+                                    HideSpinner("LoginButton", "Submit");
+                                    Redirect('/', 500);
+                                }, 2500);
                             }
                             else {
                                 LoginResult.textContent = 'The Account is not registered.';
+                                HideSpinner("LoginButton", "Submit");
                             }
                         }
-                        else
-                        {
+                        else {
                             LoginResult.textContent = 'No response from the server.';
+                            HideSpinner("LoginButton", "Submit");
                         }
                     }
                 });
         }
-        else
-        {
+        else {
             LoginResult.textContent = 'Invalid data, please insert a valid data';
+
         }
     });
 });
 
 //Handle the login Confirmation Button POST's request using AJAX
-$(document).ready(function ()
-{
-    $("#LoginCodeButton").on('click', e =>
-    {
+$(document).ready(function () {
+    $("#LoginCodeButton").on('click', e => {
         e.preventDefault();
         ShowSpinner('LoginCodeButton', 'Submit');
         $.ajax
-        ({
-            type: "POST",
-            url: 'Login/Check',
-            data: $("#LoginForm").serialize(),
-            dataType: "json",
-            success: function (response)
-            {
-                if (response != null)
-                {
-                    console.log(response);
-                    let ConfirmationResult = document.getElementById('ConfirmationResult');
-                    if (response.state === 'Failed')
-                    {
-                        HideSpinner('LoginCodeButton', 'Submit');
-                        ConfirmationResult.classList.replace("text-success", "text-danger");
-                        ConfirmationResult.textContent = 'Invalid Confirmation Code';
-                    }
-                    else
-                    {
-                        ConfirmationResult.classList.replace("text-danger", "text-success");
-                        ConfirmationResult.textContent = 'Redirection..';
-                        window.setTimeout(function ()
-                        {
+            ({
+                type: "POST",
+                url: 'Login/Check',
+                data: $("#LoginForm").serialize(),
+                dataType: "json",
+                success: function (response) {
+                    if (response != null) {
+                        console.log(response);
+                        let ConfirmationResult = document.getElementById('ConfirmationResult');
+                        if (response.state === 'Failed') {
                             HideSpinner('LoginCodeButton', 'Submit');
-                            Redirect('/', 500);
-                            HideModal('#ConfirmationModal');
-                        }, 2500);
+                            ConfirmationResult.classList.replace("text-success", "text-danger");
+                            ConfirmationResult.textContent = 'Invalid Confirmation Code';
+                        }
+                        else {
+                            ConfirmationResult.classList.replace("text-danger", "text-success");
+                            ConfirmationResult.textContent = 'Redirection..';
+                            window.setTimeout(function () {
+                                HideSpinner('LoginCodeButton', 'Submit');
+                                Redirect('/', 500);
+                                HideModal('#ConfirmationModal');
+                            }, 2500);
+                        }
                     }
                 }
+            });
+    });
+});
+
+//Search Functionality for Student
+$(document).ready(function () {
+    var $rows = $('#StudentTable tr');
+    $('#StudentSearch').keyup(function () {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+        $rows.show().filter(function () {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return !~text.indexOf(val);
+        }).hide();
+    });
+});
+
+//Search Functionality for Candidate
+$(document).ready(function () {
+    var $rows = $('#CandidateTable tr');
+    $('#CandidateSearch').keyup(function () {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+        $rows.show().filter(function () {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return !~text.indexOf(val);
+        }).hide();
+    });
+});
+
+//Handles the deletion of the student in admin dashboard.
+function DeleteStudentConfirmation(Id) {
+    console.log("Delete Student Confirmation: " + Id);
+    document.getElementById('DeleteStudentButton').onclick = function () { DeleteStudent(Id); };
+    $('#DeleteStudentConfirmation').modal('show');
+}
+function DeleteStudent(Id) {
+    console.log("Delete Student On Click call back: " + Id);
+    $.ajax
+        ({
+            type: "POST",
+            url: 'Dashboard/DeleteStudent',
+            data: { Id: Id },
+            dataType: "json",
+            success: function (response) {
+                console.log("JSON Response from Server: " + response.status);
             }
         });
-    });
-});
+}
 
-//Handle the Access Panel Button POST's request using AJAX
-$(document).ready(function ()
-{
-    $("#AccessPanelButton").on('click', e =>
-    {
-        e.preventDefault();
-        let AccessPanelResult = document.getElementById('AccessPanelResult');
-        AccessPanelResult.textContent = '';
+function DeleteCandidateConfirmation(Id) {
+    console.log("Delete Candidate Confirmation: " + Id);
+    document.getElementById('DeleteCandidateButton').onclick = function () { DeleteCandidate(Id); };
+    $('#DeleteCandidateConfirmation').modal('show');
+}
 
-        $("#AccessPanelForm").validate();
-
-        if ($("#AccessPanelForm").valid())
-        {
-            ShowSpinner("AccessPanelButton", "Access");
-            $.ajax
-                ({
-                    type: "POST",
-                    url: 'AccessPanel?',
-                    data: $("#AccessPanelForm").serialize(),
-                    dataType: "json",
-                    success: function (response)
-                    {
-                        HideSpinner("AccessPanelButton", "Access");
-                        if (response != null)
-                        {
-                            console.log(response);
-
-                            if (response.state === 'Success')
-                            {
-                                AccessPanelResult.textContent = '';
-                                window.setTimeout(function ()
-                                {
-                                    Redirect('/', 500);
-                                }, 2500);
-                            }
-                            else if (response.state === 'ErrorPassword')
-                            {
-                                AccessPanelResult.textContent = 'Invalid Password, please enter a valid password.';
-                            }
-                            else if (response.state === 'ErrorActive')
-                            {
-                                AccessPanelResult.textContent = 'You are already signed in.';
-                            }
-                            else
-                            {
-                                AccessPanelResult.textContent = 'The Account is not registered.';
-                            }
-                        }
-                        else
-                        {
-                            AccessPanelResult.textContent = 'No response from the server.';
-                        }
-                    }
-                });
-        }
-        else
-        {
-            AccessPanelResult.textContent = 'Invalid data, please insert a valid data';
-        }
-    });
-});
+//Handles the deletion of the candidate in admin dashboard.
+function DeleteCandidate(Id) {
+    console.log("Delete Candidate Confirmed: " + Id);
+    $.ajax
+        ({
+            type: "POST",
+            url: 'Dashboard/DeleteCandidate',
+            data: { Id: Id },
+            dataType: "json",
+            success: function (response) {
+                console.log("JSON Response: " + response.id);
+            }
+        });
+}

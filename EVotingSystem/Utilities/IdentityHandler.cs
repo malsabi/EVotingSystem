@@ -259,10 +259,10 @@ namespace EVotingSystem.Utilities
         {
             return CookieHandler.ContainsCookie(Config.AdminIdentityCookieName) == false;
         }
-        public void LoginAdmin(AccessPanelModel AccessPanel)
+        public void LoginAdmin(LoginModel Login)
         {
             DateTime Expires;
-            if (AccessPanel.StaySignedIn.Equals("true"))
+            if (Login.StaySignedIn.Equals("true"))
             {
                 //Persistant cookie that will stay for 30 days ~ 1 month.
                 //The admin will remain signed in for 30 days.
@@ -276,7 +276,7 @@ namespace EVotingSystem.Utilities
             }
 
             //Get the Admin model
-            AdminModel Admin = FireStore.GetAdmin(AccessPanel.Email).Result;
+            AdminModel Admin = FireStore.GetAdmin(Login.Email).Result;
 
             //Create Cookie value that will contain the login information encrypted by AES and serialized into JSON
             string EncryptedJsonString = AES.Encrypt(JsonSerializer.Serialize(Admin), Config.Password);

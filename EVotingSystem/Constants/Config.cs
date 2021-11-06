@@ -89,6 +89,21 @@
         /// Represents if the admin should not stay signed in
         /// </summary>
         public static readonly string AdminStayOffline = "false";
+
+        /// <summary>
+        /// Represents the path of the logs
+        /// </summary>
+        public static readonly string LoggerPath = "LOGS";
+
+        /// <summary>
+        /// Represents the path of the admin logs
+        /// </summary>
+        public static readonly string AdminLogPath = "ADMIN-LOGS";
+
+        /// <summary>
+        /// Represents the path of the student log
+        /// </summary>
+        public static readonly string StudentLogPath = "STUDENT-LOGS";
         #endregion
 
         #region "AES Constants"

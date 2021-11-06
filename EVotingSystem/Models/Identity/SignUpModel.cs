@@ -10,9 +10,9 @@ namespace EVotingSystem.Models.Identity
     public class SignUpModel
     {
         [FirestoreProperty] //Serialize
-        [Required(ErrorMessage = "Please insert your first name")] //Validation
-        [MaxLength(30, ErrorMessage = "Cannot exceed more than 30 letters")] //Validation
-        [NameValidation(ErrorMessage = "Invalid First Name, Please use letters only")] //Validation
+        [Required(ErrorMessage = "Please insert your first name")]
+        [MaxLength(30, ErrorMessage = "Cannot exceed more than 30 letters")]
+        [NameValidation(ErrorMessage = "Invalid First Name, Please use letters only")]
         public string FirstName { get; set; }
 
         [FirestoreProperty]
@@ -24,7 +24,7 @@ namespace EVotingSystem.Models.Identity
 
         [FirestoreProperty]
         [Required(ErrorMessage = "Please insert your National Id")]
-        [MaxLength(30, ErrorMessage = "National Id cannot exceed more than 30 characters")] //Change Length.
+        [MaxLength(30, ErrorMessage = "National Id cannot exceed more than 18 characters")]
         [NationalIdValidation( ErrorMessage = "Invalid National Id, please insert a valid UAE Id")]
         public string NationalId { get; set; }
 
@@ -56,6 +56,7 @@ namespace EVotingSystem.Models.Identity
         [FirestoreProperty]
         [Required(ErrorMessage = "Please insert your gender")]
         [MaxLength(6, ErrorMessage = "gender cannot exceed more than 6 letters")]
+        [GenderValidation(ErrorMessage = "Invalid gender, please insert a valid Gender")]
         public string Gender { get; set; }
 
         public string Code { get; set; }

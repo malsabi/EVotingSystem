@@ -1,4 +1,6 @@
 ﻿@using EVotingSystem.Models.Student
+@using EVotingSystem.Utilities;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @model StudentModel
 @{
     ViewData["Title"] = "Home Page";
@@ -11,13 +13,20 @@
                 <p style="font-size: 2.8vh;" class="text-dark">WELCOME TO</p>
                 <p style="font-size: 2.8vh;" class="text-dark">Student Council Secure E-Voting System</p>
                 <p style="font-size: 2.8vh;" class="text-dark">FWC-FMC</p>
-                <div class="d-inline-block mt-md-3">
-                    <a class="btn btn-secondary btn-lg" style="text-decoration-line: underline; border-radius: 40px;" asp-controller="Candidates" asp-action="Index">BEGIN CAST YOUR VOTE</a>
-                </div>
-                <br />
-                <div class="d-inline-block mt-md-3">
-                    <a class="text-dark font-italic" style="text-decoration-line: underline; font-size: 1.8vh;" asp-controller="SignUp" asp-action="Index">Create a new account</a>
-                </div>
+
+                @if (new IdentityHandler().IsAdminLoggedIn(HttpContextAccessor.HttpContext.Request, HttpContextAccessor.HttpContext.Response) == false)
+                {
+                    <div class="d-inline-block mt-md-3">
+                        <a class="btn btn-secondary btn-lg" style="text-decoration-line: underline; border-radius: 40px;" asp-controller="Candidates" asp-action="Index">BEGIN CAST YOUR VOTE</a>
+                    </div>
+                    <br />
+                    @if (new IdentityHandler().IsStudentLoggedIn(HttpContextAccessor.HttpContext.Request, HttpContextAccessor.HttpContext.Response) == false)
+                    {
+                        <div class="d-inline-block mt-md-3">
+                            <a class="text-dark font-italic" style="text-decoration-line: underline; font-size: 1.8vh;" asp-controller="SignUp" asp-action="Index">Create a new account</a>
+                        </div>
+                    }
+                }
             </div>
             <div class="col">
                 ​<picture>
