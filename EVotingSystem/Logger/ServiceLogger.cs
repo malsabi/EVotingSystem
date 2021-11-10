@@ -3,14 +3,14 @@ using System;
 
 namespace EVotingSystem.Logger
 {
-    public static class Logger
+    public static class ServiceLogger
     {
         #region "Fields"
         private static FireStoreManager FireStore;
         private static object LogLock;
         #endregion
 
-        static Logger()
+        static ServiceLogger()
         {
             Initialize();
         }
@@ -26,20 +26,20 @@ namespace EVotingSystem.Logger
         #endregion
 
         #region "Public Static Methods"
-        public static void Log(LogType LogType, LogLevel LogLevel, string Message)
+        public static void Log(LogType LogType, LogLevel LogLevel, string Title, string Message)
         {
             lock (LogLock)
             {
                 LogEntry Entry = null;
                 if (LogType.Equals(LogType.Admin))
                 {
-                    Entry = new LogEntry(LogLevel, Message, DateTime.Now);
-                    //Add "Entry" in AdminLog
+                    Entry = new LogEntry(LogLevel, Title, Message, DateTime.Now.ToString());
+                    FireStore.LogAdminEntry(Entry);
                 }
                 else
                 {
-                    Entry = new LogEntry(LogLevel, Message, DateTime.Now);
-                    //Add "Entry" in StudentLog
+                    Entry = new LogEntry(LogLevel, Title, Message, DateTime.Now.ToString());
+                    FireStore.LogStudentEntry(Entry);
                 }
             }
         }

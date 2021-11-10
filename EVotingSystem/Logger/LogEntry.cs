@@ -1,22 +1,35 @@
-﻿using System;
-using Google.Cloud.Firestore;
+﻿using Google.Cloud.Firestore;
 namespace EVotingSystem.Logger
 {
     [FirestoreData]
     public class LogEntry
     {
+        #region "Properties"
         [FirestoreProperty]
-        public LogLevel LogLevel { get; private set; }
+        public string LogLevel { get; private set; }
+
+        [FirestoreProperty]
+        public string Title { get; private set; }
 
         [FirestoreProperty]
         public string Message { get; private set; }
 
         [FirestoreProperty]
-        public DateTime TimeStamp { get; private set; }
+        public string TimeStamp { get; private set; }
+        #endregion
 
-        public LogEntry(LogLevel LogLevel, string Message, DateTime TimeStamp)
+        public LogEntry()
         {
-            this.LogLevel = LogLevel;
+            LogLevel = string.Empty;
+            Title = string.Empty;
+            Message = string.Empty;
+            TimeStamp = string.Empty;
+        }
+
+        public LogEntry(LogLevel LogLevel, string Title, string Message, string TimeStamp)
+        {
+            this.LogLevel = LogLevel.ToString();
+            this.Title = Title;
             this.Message = Message;
             this.TimeStamp = TimeStamp;
         }

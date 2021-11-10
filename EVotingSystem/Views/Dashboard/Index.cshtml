@@ -4,6 +4,8 @@
 @using Highsoft.Web.Mvc.Charts
 @using Highsoft.Web.Mvc.Charts.Rendering
 @using System.Collections
+@using EVotingSystem.Helpers;
+@using EVotingSystem.DataBase;
 
 @model DashboardModel
 @{
@@ -85,7 +87,7 @@
                             @for (int i = 0; i < Model.Students.Count; i++)
                             {
                                 StudentModel Student = Model.Students[i];
-                                <tr class="text-dark">
+                                <tr class="text-dark" id="@Student.StudentId">
                                     <th scope="row">@(i + 1)</th>
                                     <td>@Student.StudentId</td>
                                     <td>@Student.FirstName</td>
@@ -117,6 +119,7 @@
                             <p>Are you sure you want to delete the student ?</p>
                         </div>
                         <div class="modal-footer">
+                            <p id="DeleteStudentResult" class="text-success" style="flex:auto;"></p>
                             <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">
                                 Close
                             </button>
@@ -136,7 +139,7 @@
                         <h3 class="text-white">Candidates Manager</h3>
                     </div>
                     <div class="col-md pt-md-2 ml-auto col-no-padding">
-                        <button type="button" class="btn btn-sm btn-success float-md-right" style="border-radius: 10px;">
+                        <button id="OpenAddCandidateModal" class="btn btn-sm btn-success float-md-right" style="border-radius: 10px;">
                             <i class="far fa-user pr-md-2" aria-hidden="true"></i>
                             Add Candidate
                         </button>
@@ -168,14 +171,16 @@
                             @for (int i = 0; i < Model.Candidates.Count; i++)
                             {
                                 CandidateModel Candidate = Model.Candidates[i];
-                                <tr class="text-dark">
+                                CandidateVoteModel CandidateVote = new FireStoreManager().GetCandidateVote(CandidateHelper.EncryptField(Candidate.Id)).Result;
+                                CandidateVote.DecryptProperties();
+                                <tr class="text-dark" id="@Candidate.Id">
                                     <th scope="row">@(i + 1)</th>
                                     <td>@Candidate.Id</td>
                                     <td>@Candidate.Name</td>
                                     <td>@Candidate.Gender</td>
-                                    <td>@(50 * i)</td>
+                                    <td>@CandidateVote.TotalVotes</td>
                                     <td>
-                                        <button type="button" class="close" onClick="DeleteCandidate('@Candidate.Id');">
+                                        <button type="button" class="close" onClick="DeleteCandidateConfirmation('@Candidate.Id');">
                                             <span aria-hidden="true" class="text-danger">&times;</span>
                                         </button>
                                     </td>
@@ -199,6 +204,7 @@
                             <p>Are you sure you want to delete the Candidate ?</p>
                         </div>
                         <div class="modal-footer">
+                            <p id="DeleteCandidateResult" class="text-success" style="flex:auto;"></p>
                             <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">
                                 Close
                             </button>
@@ -210,6 +216,54 @@
                 </div>
             </div>
             <!--End of Candidate Confirmation modal-->
+
+            <!-- Start of Add Candidate Modal -->
+            <div class="modal fade" id="AddCandidateModal" tabindex="-1" role="dialog" aria-labelledby="AddCandidateModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="AddCandidateModalLabel">Add Candidate</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post" id="AddCandidateForm">
+                                <div class="form-group">
+                                    <label for="NameTextBox">Name</label>
+                                    <input type="text" class="form-control" id="CNameTB" placeholder="Candidate Name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="GenderTextBox">Gender</label>
+                                    <input type="text" class="form-control" id="CGenderTB" placeholder="Candidate Gender">
+                                </div>
+                                <div class="form-group">
+                                    <labe for="IdTextBox">Id</labe>
+                                    <input type="text" class="form-control" id="CIdTB" placeholder="Candidate Identification (Id)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="SpeachTextBox">Speach</label>
+                                    <textarea type="text" class="form-control" id="CSpeachTB" placeholder="Candidate Personal Speach"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ImageTextBox">Image</label>
+                                    <textarea type="text" class="form-control" id="CImageTB" placeholder="Candidate Image (Base64)"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <p id="AddCandidateResult" class="text-success" style="flex:auto;"></p>
+                            <button type="button" class="btn btn-secondary btn-lg" data-dismiss="modal">
+                                Close
+                            </button>
+                            <button id="AddCandidateButton" type="submit" class="btn btn-lg btn-primary">
+                                Add Candidate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of Add Candidate Modal -->
         </div>
         @{
             Highcharts StudentChartOptions = new Highcharts

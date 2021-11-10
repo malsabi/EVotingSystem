@@ -1,6 +1,8 @@
 ﻿using EVotingSystem.Constants;
 using EVotingSystem.DataBase;
+using EVotingSystem.Logger;
 using EVotingSystem.Models;
+using EVotingSystem.Models.Student;
 using EVotingSystem.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -16,7 +18,6 @@ namespace EVotingSystem.Controllers
 
         public HomeController()
         {
-            Logger.Logger.Log(Logger.LogLevel.Get, null);
             FireStore = new FireStoreManager();
             Identity = new IdentityHandler(this);
         }
@@ -40,10 +41,12 @@ namespace EVotingSystem.Controllers
         {
             if (Identity.IsStudentLoggedIn())
             {
+                StudentModel Student = Identity.StudentSession();
                 //Change status in the database
-                FireStore.LogoutStudent(Identity.StudentSession());
+                FireStore.LogoutStudent(Student);
                 //Remove the user session cookie.
                 Identity.LogoutStudent();
+                ServiceLogger.Log(LogType.Student, LogLevel.Get, Config.StudentGetTitle, string.Format("{0}: {1}", Student.StudentId, Config.StudentGetLogoutMessage));
             }
             else if (Identity.IsAdminLoggedIn())
             {
@@ -51,6 +54,7 @@ namespace EVotingSystem.Controllers
                 FireStore.LogoutAdmin(Identity.AdminSession());
                 //Remove the user session cookie.
                 Identity.LogoutAdmin();
+                ServiceLogger.Log(LogType.Admin, LogLevel.Get, Config.AdminGetTitle, Config.AdminGetLogoutMessage);
             }
             return RedirectToAction("Index", "Home");
         }

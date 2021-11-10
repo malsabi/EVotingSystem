@@ -63,6 +63,24 @@ function HideSpinner(Id, Content) {
     Button.innerHTML = Content;
 }
 
+function AddCandidateRow(Name, Gender, Id) {
+
+    let Count = $('#CandidateTable tr').length + 1;
+    $('#CandidateTable > tbody:last-child').append(
+        "<tr class=\"text-dark\" id=\"" + Id + "\">" +
+        "<th scope=\"row\">" + Count + "</th>" +
+        "<td>" + Id + "</td>" +
+        "<td>" + Name + "</td>" +
+        "<td>" + Gender + "</td>" +
+        "<td>" + 0 + "</td>" +
+        "<td>" +
+        "<button type=\"button\" class=\"close\" onClick=\"DeleteCandidateConfirmation('" + Id + "');\">" +
+        "<span aria-hidden=\"true\" class=\"text-danger\">&times;</span>" +
+        "</button>" +
+        "</td>" +
+        "</tr>");
+}
+
 //Add the Name Validation that is hooked with the server side validation.
 jQuery.validator.addMethod('NameValidation', function (value, element) {
     if (value == null || value.length == 0) {
@@ -195,14 +213,33 @@ $(document).ready(function () {
         document.getElementById('ConfirmationResult').textContent = '';
         document.getElementById('CodeTextBox').value = '';
     });
+    //Modal event when it is hidden it will be raised.
+    $('#DeleteStudentConfirmation').on('hidden.bs.modal', function (e) {
+        document.getElementById('DeleteStudentResult').textContent = '';
+    });
+    //Modal event when it is hidden it will be raised.
+    $('#DeleteCandidateConfirmation').on('hidden.bs.modal', function (e) {
+        document.getElementById('DeleteCandidateResult').textContent = '';
+    });
+    //Modal even when it is hidden it will be raised.
+    $('#AddCandidateModal').on('hidden.bs.modal', function (e) {
+        document.getElementById('CNameTB').value    = '';
+        document.getElementById('CGenderTB').value  = '';
+        document.getElementById('CIdTB').value      = '';
+        document.getElementById('CSpeachTB').value  = '';
+        document.getElementById('CImageTB').value = '';
+        document.getElementById('AddCandidateResult').textContent = '';
+    });
 });
 
 //When the document (page) is ready and loaded, it will do the following:
 //1. It will attempt to clear the sign up form.
-//2. It will attempt to hide the modal.
+//2. It will attempt to hide the modals.
 $(document).ready(function () {
     ResetSignUp();
     HideModal('#ConfirmationModal');
+    HideModal('#DeleteStudentConfirmation');
+    HideModal('#DeleteCandidateConfirmation');
 });
 
 //When the document (page) is ready and loaded, it will do the following:
@@ -353,7 +390,7 @@ $(document).ready(function () {
                     data: $("#LoginForm").serialize(),
                     dataType: "json",
                     success: function (response) {
-                      
+
                         if (response != null) {
                             console.log(response);
 
@@ -466,6 +503,7 @@ function DeleteStudentConfirmation(Id) {
 }
 function DeleteStudent(Id) {
     console.log("Delete Student On Click call back: " + Id);
+    ShowSpinner('DeleteStudentButton', 'Delete');
     $.ajax
         ({
             type: "POST",
@@ -473,7 +511,17 @@ function DeleteStudent(Id) {
             data: { Id: Id },
             dataType: "json",
             success: function (response) {
-                console.log("JSON Response from Server: " + response.status);
+                HideSpinner('DeleteStudentButton', 'Delete');
+                let DeleteStudentResult = document.getElementById('DeleteStudentResult');
+                if (response.state === 'Success') {
+                    DeleteStudentResult.textContent = 'Successfully deleted';
+                    HideModal('#DeleteStudentConfirmation');
+                    document.getElementById(Id).remove();
+                }
+                else {
+                    DeleteStudentResult.classList.replace("text-success", "text-danger");
+                    DeleteStudentResult.textContent = 'Failed to delete';
+                }
             }
         });
 }
@@ -487,6 +535,7 @@ function DeleteCandidateConfirmation(Id) {
 //Handles the deletion of the candidate in admin dashboard.
 function DeleteCandidate(Id) {
     console.log("Delete Candidate Confirmed: " + Id);
+    ShowSpinner('DeleteCandidateButton', 'Delete');
     $.ajax
         ({
             type: "POST",
@@ -494,7 +543,50 @@ function DeleteCandidate(Id) {
             data: { Id: Id },
             dataType: "json",
             success: function (response) {
-                console.log("JSON Response: " + response.id);
+                HideSpinner('DeleteCandidateButton', 'Delete');
+                let DeleteCandidateResult = document.getElementById('DeleteCandidateResult');
+                if (response.state === 'Success') {
+                    DeleteCandidateResult.textContent = 'Successfully deleted';
+                    HideModal('#DeleteCandidateConfirmation');
+                    document.getElementById(Id).remove();
+                }
+                else {
+                    DeleteCandidateResult.classList.replace("text-success", "text-danger");
+                    DeleteCandidateResult.textContent = 'Failed to delete';
+                }
             }
         });
 }
+
+
+$(document).ready(function () {
+    $('#OpenAddCandidateModal').on('click', e => {
+        $('#AddCandidateModal').modal('show');
+    });
+
+    $('#AddCandidateButton').on('click', e => {
+        ShowSpinner('AddCandidateButton', 'Add Candidate');
+        $.ajax
+            ({
+                type: "POST",
+                url: 'Dashboard/AddCandidate',
+                data: { Candidate: "".concat($('#CNameTB').val(), "|", $('#CGenderTB').val(), "|", $('#CIdTB').val(), "|", $('#CSpeachTB').val(), "|", $('#CImageTB').val()) },
+                dataType: "json",
+                success: function (response) {
+                    console.log("Add Candidate Response: " + response.state);
+
+                    HideSpinner('AddCandidateButton', 'Add Candidate');
+                    let AddCandidateResult = document.getElementById('AddCandidateResult');
+                    if (response.state === 'Success') {
+                        AddCandidateResult.textContent = 'Successfully added';
+                        HideModal('#AddCandidateModal');
+                        AddCandidateRow(response.name, response.gender, response.id);
+                    }
+                    else {
+                        AddCandidateResult.classList.replace("text-success", "text-danger");
+                        AddCandidateResult.textContent = response.reason;
+                    }
+                }
+            });
+    });
+});

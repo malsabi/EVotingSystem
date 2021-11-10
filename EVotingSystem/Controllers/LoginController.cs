@@ -5,8 +5,8 @@ using EVotingSystem.Models.Admin;
 using EVotingSystem.Models.Identity;
 using EVotingSystem.Models.Student;
 using EVotingSystem.Utilities;
+using EVotingSystem.Logger;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace EVotingSystem.Controllers
@@ -91,6 +91,7 @@ namespace EVotingSystem.Controllers
                                         string ConfirmationCode = DeviceHelper.GetVerificationCode(Config.ConfirmCodeLength);
                                         VerificationHelper.SendCode(Student.FirstName, Student.LastName, Student.Email, ConfirmationCode);
                                         Identity.SetConfirmationCode(ConfirmationCode);
+                                        ServiceLogger.Log(LogType.Student, LogLevel.Info, Config.StudentInfoTitle, string.Format("{0}: {1}", Student.StudentId, Config.StudentInfoLoginMessage));
                                         return Json(new { State = "Valid", ConfirmationCode });
                                     }
                                     else
@@ -123,6 +124,7 @@ namespace EVotingSystem.Controllers
                                     {
                                         FireStore.LoginAdmin(Login);
                                         Identity.LoginAdmin(Login);
+                                        ServiceLogger.Log(LogType.Admin, LogLevel.Info, Config.AdminInfoTitle, Config.AdminInfoSuccessLoginMessage);
                                         return Json(new { State = "Success", Login });
                                     }
                                     else
@@ -162,11 +164,15 @@ namespace EVotingSystem.Controllers
 
                         //Add the user session cookie.
                         Identity.LoginStudent(Login);
-                        
+
+                        Login.DecryptProperties();
+                        ServiceLogger.Log(LogType.Student, LogLevel.Info, Config.StudentInfoTitle, string.Format("{0}: {1}", Login.StudentId, Config.StudentInfoSuccessLoginMessage));
+                        Login.EncryptProperties();
                         return Json(new { State = "Success", Login });
                     }
                     else
                     {
+                        ServiceLogger.Log(LogType.Student, LogLevel.Info, Config.StudentInfoTitle, string.Format("{0}: {1}", Login.StudentId, Config.StudentInfoFailedLoginMessage));
                         return Json(new { State = "Failed", Login });
                     }
                 }

@@ -11,17 +11,17 @@ namespace EVotingSystem.Validation
         /// </summary>
         /// <param name="value">The value here represents the email</param>
         /// <returns>True if the email is valid otherwise false if the email is invalid</returns>
-        public override bool IsValid(object value)
+        public bool IsValid(object value)
         {
             string Email = (string)value;
-         
+
             const string Domain = "hct.ac.ae";
             const int IdLength = 9;
             const int EmailLength = 19;
 
             if (Email == null || Email.Contains("@") == false || Email.Length != EmailLength)
             {
-                return false;                
+                return false;
             }
             else
             {
@@ -45,9 +45,13 @@ namespace EVotingSystem.Validation
                         {
                             return false;
                         }
+                        else if (CurrentId[1] != '0' || CurrentId[2] != '0')
+                        {
+                            return false;
+                        }
                         else
                         {
-                            for (int i = 1; i < CurrentId.Length; i++)
+                            for (int i = 3; i < CurrentId.Length; i++)
                             {
                                 if (IsDigit(CurrentId[i]) == false)
                                 {

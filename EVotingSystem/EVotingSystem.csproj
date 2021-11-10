@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Logger\Messages\" />
     <Folder Include="Views\Contact\" />
   </ItemGroup>
 

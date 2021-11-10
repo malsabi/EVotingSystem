@@ -13,10 +13,10 @@
         <div class="card">
             <h3 class="card-header">Recent Votes</h3>
             <div class="card-deck p-md-4">
-                @{ List<CandidateModel> VotedCanddiates = CandidateHandler.GetStudentCandidateVotes(Model); }
-                @if (VotedCanddiates.Count > 0)
+                @{ List<CandidateModel> VotedCandidates = CandidateHandler.GetStudentCandidateVotes(Model); }
+                @if (VotedCandidates.Count > 0)
                 {
-                    @foreach (CandidateModel CM in CandidateHandler.GetStudentCandidateVotes(Model))
+                    @foreach (CandidateModel CM in VotedCandidates)
                     {
                         CM.DecryptProperties();
                         <div class="card border-success mb-3" style="max-width: 18rem;">

@@ -7,6 +7,8 @@ using Google.Cloud.Firestore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using EVotingSystem.Logger;
+using System.Linq;
 
 namespace EVotingSystem.DataBase
 {
@@ -104,6 +106,16 @@ namespace EVotingSystem.DataBase
             catch
             {
             }
+        }
+        /// <summary>
+        /// Removes the student from the database
+        /// </summary>
+        /// <param name="Student">Represents the student model</param>
+        public async void RemoveStudent(string StudentId)
+        {
+            DocumentReference StudentDocument = FireStoreDataBase.Collection(Config.StudentPath).Document(StudentId);
+            await StudentDocument.DeleteAsync();
+            RemoveStudentCandidateVotes(StudentId);
         }
         /// <summary>
         /// Gets the Student Information from the database
@@ -280,6 +292,31 @@ namespace EVotingSystem.DataBase
             }
             return Students;
         }
+        /// <summary>
+        /// Remove the votes attempted from the student to the candidate
+        /// </summary>
+        /// <param name="Student">Represents the student model</param>
+        public void RemoveStudentCandidateVotes(string StudentId)
+        {
+            FireStoreManager FireStore = new FireStoreManager();
+            List<CandidateModel> Candidates = FireStore.GetAllCandidates().Result;
+            foreach (CandidateModel Candidate in Candidates)
+            {
+                CandidateVoteModel CandidateVote = FireStore.GetCandidateVote(Candidate.Id).Result;
+        
+                if (CandidateVote.StudentVoteCollection != null)
+                {
+                    int RemovedItems = CandidateVote.StudentVoteCollection.RemoveAll(cv => cv.Id.Equals(StudentId));
+                    if (RemovedItems > 0)
+                    {
+                        CandidateVote.DecryptProperties();
+                        CandidateVote.TotalVotes = (int.Parse(CandidateVote.TotalVotes) - 1).ToString();
+                        CandidateVote.EncryptProperties();
+                        FireStore.UpdateCandidateVote(CandidateVote).Wait();
+                    }
+                }
+            }
+        }
         #endregion
 
         #region "Candidate"
@@ -316,8 +353,7 @@ namespace EVotingSystem.DataBase
         {
             DocumentReference CandidateDocument = FireStoreDataBase.Collection(Config.CandidatePath).Document(Id);
             await CandidateDocument.DeleteAsync();
-            DocumentReference CandidateVoteDocument = FireStoreDataBase.Collection(Config.CandidateVotePath).Document(Id);
-            await CandidateVoteDocument.DeleteAsync();
+            RemoveCandidateVote(GetCandidateVote(Id).Result);
         }
         /// <summary>
         /// Updates the Candidate model in the database
@@ -468,6 +504,28 @@ namespace EVotingSystem.DataBase
             DocumentReference Document = FireStoreDataBase.Collection(Config.CandidateVotePath).Document(CandidateVote.Id);
             return await Document.SetAsync(CandidateVote, SetOptions.Overwrite);
         }
+
+        /// <summary>
+        /// Updates the student votes after deleting a candidate vote model that contains all of the voted students
+        /// </summary>
+        /// <param name="CandidateVote">Represents a candidate vote model</param>
+        public async void RemoveCandidateVote(CandidateVoteModel CandidateVote)
+        {
+            if (CandidateVote.StudentVoteCollection != null)
+            {
+                foreach (StudentVoteModel StudentVote in CandidateVote.StudentVoteCollection)
+                {
+                    StudentVote.DecryptProperties();
+                    StudentModel Student = GetStudent(StudentVote.Id).Result;
+                    Student.TotalVotesApplied = (int.Parse(Student.TotalVotesApplied) - 1).ToString();
+                    await UpdateStudent(Student);
+                    StudentVote.EncryptProperties();
+                }
+            }
+            DocumentReference CandidateVoteDocument = FireStoreDataBase.Collection(Config.CandidateVotePath).Document(CandidateVote.Id);
+            await CandidateVoteDocument.DeleteAsync();
+        }
+
         /// <summary>
         /// Gets all of the votes from the specific path in the database
         /// </summary>
@@ -616,6 +674,19 @@ namespace EVotingSystem.DataBase
             catch
             {
             }
+        }
+        #endregion
+
+        #region "Logging"
+        public async void LogAdminEntry(LogEntry LogEntry)
+        {
+            DocumentReference Document = FireStoreDataBase.Collection(Config.LoggerPath).Document(Config.AdminLogPath);
+            await Document.UpdateAsync("Logs", FieldValue.ArrayUnion(LogEntry));
+        }
+        public async void LogStudentEntry(LogEntry LogEntry)
+        {
+            DocumentReference Document = FireStoreDataBase.Collection(Config.LoggerPath).Document(Config.StudentLogPath);
+            await Document.UpdateAsync("Logs", FieldValue.ArrayUnion(LogEntry));
         }
         #endregion
         #endregion

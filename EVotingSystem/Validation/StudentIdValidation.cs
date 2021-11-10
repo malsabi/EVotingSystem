@@ -11,7 +11,7 @@ namespace EVotingSystem.Validation
         /// </summary>
         /// <param name="value">The value here represents the StudentId</param>
         /// <returns>True if the StudentId is valid otherwise false if the email is StudentId</returns>
-        public override bool IsValid(object value)
+        public bool IsValid(object value)
         {
             string StudentId = (string)value;
 
@@ -23,11 +23,18 @@ namespace EVotingSystem.Validation
             {
                 if ((StudentId[0] == 'H') || (StudentId[0] == 'h'))
                 {
-                    for (int i = 1; i < StudentId.Length; i++)
+                    if (StudentId[1] != '0' || StudentId[2] != '0')
                     {
-                        if (IsDigit(StudentId[i]) == false)
+                        return false;
+                    }
+                    else
+                    {
+                        for (int i = 1; i < StudentId.Length; i++)
                         {
-                            return false;
+                            if (IsDigit(StudentId[i]) == false)
+                            {
+                                return false;
+                            }
                         }
                     }
                 }

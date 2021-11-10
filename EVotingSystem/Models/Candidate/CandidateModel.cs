@@ -40,5 +40,10 @@ namespace EVotingSystem.Models.Candidate
             this.Speach = CandidateHelper.DecryptField(this.Speach);
             this.Image  = CandidateHelper.DecryptField(this.Image);
         }
+
+        public override string ToString()
+        {
+            return string.Concat("[", Name, ", ", Gender, ", ", Id, ", ", Speach, " ", Image, "]");
+        }
     }
 }

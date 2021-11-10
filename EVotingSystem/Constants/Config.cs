@@ -143,5 +143,23 @@
         /// </summary>
         public readonly static string Female = "Female";
         #endregion
+
+        #region "LOGGER CONSTANTS"
+        public static readonly string StudentInfoTitle = "STUDENT-INFO";
+        public static readonly string StudentInfoLoginMessage = "Entered password correctly waiting for confirmation code.";
+        public static readonly string StudentInfoSuccessLoginMessage = "Entered correct confirmation code, logged in.";
+        public static readonly string StudentInfoFailedLoginMessage = "Incorrect confirmation code.";
+
+        public static readonly string StudentGetTitle = "STUDENT-GET";
+        public static readonly string StudentGetLogoutMessage = "Student logged out.";
+        public static readonly string StudentGetSignUpMessage = "Student Registered successfully";
+
+
+        public static readonly string AdminInfoTitle = "ADMIN-INFO";
+        public static readonly string AdminInfoSuccessLoginMessage = "Admin logged in successfuly.";
+
+        public static readonly string AdminGetTitle = "ADMIN-GET";
+        public static readonly string AdminGetLogoutMessage = "Admin logged out.";
+        #endregion
     }
 }

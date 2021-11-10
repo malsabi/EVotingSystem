@@ -65,5 +65,10 @@ namespace EVotingSystem.Models.Student
             this.Password   =  StudentHelper.DecryptField(this.Password);
             this.Phone      =  StudentHelper.DecryptField(this.Phone);
         }
+
+        public override string ToString()
+        {
+            return string.Concat("[", FirstName, ", ", LastName, ", ", NationalId, ", ", StudentId, ", ", Email, ", ", Password, ", ", Phone, "]");
+        }
     }
 }

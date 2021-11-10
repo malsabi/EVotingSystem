@@ -4,6 +4,7 @@ using EVotingSystem.Helpers;
 using EVotingSystem.Models.Identity;
 using EVotingSystem.Models.Student;
 using EVotingSystem.Utilities;
+using EVotingSystem.Logger;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EVotingSystem.Controllers
@@ -110,11 +111,10 @@ namespace EVotingSystem.Controllers
                             ExpiryDate = System.DateTime.UtcNow,
                             TotalVotesApplied = "0"
                         };
+                        ServiceLogger.Log(LogType.Student, LogLevel.Get, Config.StudentGetTitle, string.Format("{0}: {1}", Student.StudentId, Config.StudentGetSignUpMessage));
                         Student.EncryptProperties();
-
                         FireStore.RegisterStudent(Student);
                         Identity.DeleteConfirmationCode();
-
                         return Json(new { State = "Success", model });
                     }
                     else
