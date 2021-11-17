@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Contact\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Google.Cloud.Firestore" Version="2.4.0" />
     <PackageReference Include="Highsoft.Highcharts" Version="9.2.2.1" />
   </ItemGroup>

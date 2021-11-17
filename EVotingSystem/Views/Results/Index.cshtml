@@ -1,0 +1,58 @@
+﻿@using EVotingSystem.Models.Candidate;
+@using EVotingSystem.Helpers;
+@using Microsoft.AspNetCore.Html;
+@model ResultModel
+@{
+    ViewData["Title"] = "Results Page";
+}
+<div class="jumbotron rounded-lg" style="min-height: 65vh">
+    <div class="container-fluid">
+        @if (Model.WinnerCandidate != null)
+        {
+            <div class="card border-primary text-dark">
+                <div class="card-header">
+                    <h5 class="card-title">WINNER CANDIDATE ID: @Model.WinnerCandidate.Id, WITH TOTAL VOTES: @Model.TotalVotes</h5>
+                </div>
+                <div class="d-flex align-items-center pt-md-3 pb-md-3">
+                    @(new HtmlString(@CandidateHelper.GetCandidateHtmlImage("50%", "100%", Model.WinnerCandidate.Image, true)))
+                </div>
+                <div class="card-body">
+                    <h6 class="card-title">@Model.WinnerCandidate.Name</h6>
+                    <div class="border border-info p-md-3">
+                        <p class="card-text">Candidate Speach</p>
+                        <p class="card-text">@Model.WinnerCandidate.Speach</p>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            @if (Model != null && DateHelper.IsDateValid(Model.DueDate))
+            {
+                <div class="rounded bg-gradient-4 text-white shadow p-5 text-center mt-md-5">
+                    <p class="mb-0 font-weight-bold text-uppercase">
+                        The result of the winner candidate will be announced on:
+                        <span id="SpanDueDate">@Model.DueDate</span>
+                    </p>
+                    <div id="clock-c" class="countdown py-4"></div>
+                    <ul class="list-inline">
+                        <li class="list-inline-item pt-2">
+                            <button id="btn-pause" type="button" class="btn btn-demo"><i class="glyphicon glyphicon-repeat"></i>Pause</button>
+                        </li>
+                        <li class="list-inline-item pt-2">
+                            <button id="btn-resume" type="button" class="btn btn-demo"><i class="glyphicon glyphicon-repeat"></i>Resume</button>
+                        </li>
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <div class="row align-items-center">
+                    <div class="col-md-auto mx-auto">
+                        <p class="mb-0 font-weight-bold text-uppercase">The due date has not been set yet.</p>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

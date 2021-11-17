@@ -50,7 +50,7 @@ namespace EVotingSystem.Models.Identity
 
         [FirestoreProperty]
         [Required(ErrorMessage = "Please insert your phone number")]
-        [MaxLength(15, ErrorMessage = "Phone number cannot exceed more than 10 digits")]
+        [MaxLength(10, ErrorMessage = "Phone number cannot exceed more than 10 digits")]
         public string Phone { get; set; }
 
         [FirestoreProperty]

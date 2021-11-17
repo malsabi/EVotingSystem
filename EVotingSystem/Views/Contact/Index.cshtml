@@ -1,0 +1,56 @@
+﻿@using EVotingSystem.Models.Contact;
+
+@model ContactModel
+@{
+    ViewData["Title"] = "Contact Page";
+}
+
+<div class="jumbotron rounded-lg" style="min-height: 65vh">
+    <div class="container-fluid">
+        <h1 class="display-3 text-center">Contact Us</h1>
+        <br />
+        <form asp-controller="Contact" asp-action="Index" method="post" class="form-group card-text-fontsize" id="ContactForm">
+            <div class="row justify-content-center">
+                <div class="col-md-5">
+                    <label asp-for="FirstName" class="control-label">First Name:</label>
+                    <input asp-for="FirstName" class="form-control" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="col-md-5">
+                    <label asp-for="LastName" class="control-label">Last Name:</label>
+                    <input asp-for="LastName" class="form-control" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row justify-content-center mt-3">
+                <div class="col-md-5">
+                    <label asp-for="EmailAddress" class="control-label">Email Address:</label>
+                    <input asp-for="EmailAddress" class="form-control" />
+                    <span asp-validation-for="EmailAddress" class="text-danger"></span>
+                </div>
+                <div class="col-md-5">
+                    <label asp-for="PhoneNumber" class="control-label">Phone Number:</label>
+                    <input asp-for="PhoneNumber" class="form-control" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row justify-content-center mt-3">
+                <div class="col-md-10">
+                    <label asp-for="Comment" class="control-label">Comment:</label>
+                    <textarea asp-for="Comment" class="form-control form-control-lg" rows="10"></textarea>
+                    <span asp-validation-for="Comment" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row justify-content-center mt-3">
+                <div class="col-md-4 mb-3">
+                    <button id="ContactButton" type="submit" class="btn btn-primary btn-lg btn-block d-block">
+                        Send
+                    </button>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <p id="ContactResult" class="text-danger"></p>
+            </div>
+        </form>
+    </div>
+</div>

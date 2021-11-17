@@ -26,15 +26,8 @@ namespace EVotingSystem.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            if (Identity.IsAdminLoggedOut())
-            {
-                List<CandidateModel> Candidates = FireStore.GetAllCandidates(true).Result;
-                return View(Candidates.ToArray());
-            }
-            else
-            {
-                return RedirectToAction("Index", "Home");
-            }
+            List<CandidateModel> Candidates = FireStore.GetAllCandidates(true).Result;
+            return View(Candidates.ToArray());
         }
         #endregion
 

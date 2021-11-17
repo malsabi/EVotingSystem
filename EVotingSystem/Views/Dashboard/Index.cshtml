@@ -14,7 +14,63 @@
 
 <div class="jumbotron rounded-lg" style="min-height: 65vh">
     <div class="container-fluid">
-        <div class="card bg-secondary">
+        <div class="card bg-secondary mt-md-4">
+            <div class="card-header">
+                <h3 class="text-white">Voting Results Configuration</h3>
+            </div>
+            <div class="card-body text-white">
+                <div class="row">
+                    <div class="col-md-3">
+                        <p>Current Date (Today):</p>
+                    </div>
+                    <div class="col">
+                        <input readonly type="text" class="form-control" value="@DateHelper.GetCurrentDate()">
+                    </div>
+                </div>
+                <div class="row mt-md-3">
+                    <div class="col-md-3">
+                        <p>Voting Results Due Date:</p>
+                    </div>
+                    <div class="col">
+                        <input asp-for="DueDate" type="date" class="form-control" id="DueDateValue">
+                    </div>
+                </div>
+                <div class="row mt-md-3">
+                    <div class="col-md-auto">
+                        @if (DateHelper.IsDateValid(Model.DueDate))
+                        {
+                            <button class="btn btn-sm btn-primary disabled" id="InsertDueDateButton" onclick="InsertDueDate()">
+                                Insert Due Date
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-primary" id="InsertDueDateButton" onclick="InsertDueDate()">
+                                Insert Due Date
+                            </button>
+                        }
+                    </div>
+                    <div class="col-md-auto col-no-padding">
+                        @if (DateHelper.IsDateValid(Model.DueDate))
+                        {
+                            <button class="btn btn-sm btn-danger" id="DeleteDueDateButton" onclick="DeleteDueDate();">
+                                Delete Due Date
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-danger disabled" id="DeleteDueDateButton" onclick="DeleteDueDate();">
+                                Delete Due Date
+                            </button>
+                        }
+                    </div>
+                    <div class="col">
+                        <p class="text-white" id="VotingConfigResult"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card bg-secondary mt-md-4">
             <h3 class="card-header text-white">Statistics</h3>
             <div class="card-body">
                 <div class="card-deck">
@@ -216,7 +272,6 @@
                 </div>
             </div>
             <!--End of Candidate Confirmation modal-->
-
             <!-- Start of Add Candidate Modal -->
             <div class="modal fade" id="AddCandidateModal" tabindex="-1" role="dialog" aria-labelledby="AddCandidateModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">

@@ -11,7 +11,7 @@ namespace EVotingSystem.Validation
         /// </summary>
         /// <param name="value">The value here represents the email</param>
         /// <returns>True if the email is valid otherwise false if the email is invalid</returns>
-        public bool IsValid(object value)
+        public override bool IsValid(object value)
         {
             string Email = (string)value;
 

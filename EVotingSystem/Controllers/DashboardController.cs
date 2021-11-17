@@ -155,6 +155,47 @@ namespace EVotingSystem.Controllers
                 }
             }
         }
+
+        [HttpPost]
+        public IActionResult AddDueDate(string DueDate)
+        {
+            if (DateHelper.IsDateValid(DueDate))
+            {
+                if (DateHelper.IsDateBeforeOrEqual(DueDate))
+                {
+                    return Json(new { State = "Invalid" });
+                }
+                else
+                {
+                    ResultModel Result = new ResultModel
+                    {
+                        DueDate = DueDate,
+                        WinnerCandidate = null
+                    };
+                    FireStore.AddDueDate(Result);
+                    return Json(new { State = "Success", DueDate });
+                }
+           
+            }
+            else
+            {
+                return Json(new { State = "Error" });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult DeleteDueDate()
+        {
+            if (FireStore.IsDueDateAdded())
+            {
+                FireStore.DeleteDueDate();
+                return Json(new { State = "Success" });
+            }
+            else
+            {
+                return Json(new { State = "Error" });
+            }
+        }
         #endregion
     }
 }

@@ -40,5 +40,8 @@ namespace EVotingSystem.Models.Dashboard
 
         [FirestoreProperty]
         public int TotalAttemptedMaleVotes { get; set; }
+
+        [FirestoreProperty]
+        public string DueDate { get; set; }
     }
 }

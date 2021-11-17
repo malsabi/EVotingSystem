@@ -161,5 +161,9 @@
         public static readonly string AdminGetTitle = "ADMIN-GET";
         public static readonly string AdminGetLogoutMessage = "Admin logged out.";
         #endregion
+
+        #region "RESULT CONSTANTS"
+        public static readonly string Results = "RESULTS";
+        #endregion
     }
 }

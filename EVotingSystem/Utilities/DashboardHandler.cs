@@ -31,11 +31,14 @@ namespace EVotingSystem.Utilities
         #region "Public Methods"
         public DashboardModel GetDashboardInformation()
         {
-            DashboardModel Dashboard = new DashboardModel();
-
+            DashboardModel Dashboard = new DashboardModel
+            {
+                DueDate = FireStore.GetResult().DueDate
+            };
             List<StudentModel> Students = FireStore.GetAllStudents(true).Result;
             List<CandidateModel> Candidates = FireStore.GetAllCandidates(true).Result;
             List<CandidateVoteModel> Votes = FireStore.GetAllCandidateVotes(true).Result;
+
 
             Dashboard.Students = Students.OrderBy(s => s.FirstName).ToList();
             Dashboard.Candidates = Candidates.OrderBy(c => c.Name).ToList();

@@ -1,4 +1,5 @@
 using EVotingSystem.Constants;
+using EVotingSystem.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -31,6 +32,7 @@ namespace EVotingSystem
                 options.Cookie.IsEssential = true;
             });
             services.AddControllersWithViews();
+            services.AddHostedService<CandidateResultMonitor>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

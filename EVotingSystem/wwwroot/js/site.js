@@ -590,3 +590,150 @@ $(document).ready(function () {
             });
     });
 });
+
+
+//Handle the Contact Button POST's request using AJAX
+$(document).ready(function () {
+    $("#ContactButton").on('click', e =>
+    {
+        e.preventDefault();
+        $("#ContactForm").validate();
+        if ($("#ContactForm").valid())
+        {
+            let ContactResult = document.getElementById('ContactResult');
+            ShowSpinner("ContactButton", "Send");
+            $.ajax
+            ({
+                type: "POST",
+                url: 'Contact',
+                data: $("#ContactForm").serialize(),
+                dataType: "json",
+                success: function (response)
+                {
+                    console.log("Response: " + response.state)
+                    if (response.state == 'Success')
+                    {
+                        window.setTimeout(function ()
+                        {
+                            HideSpinner("ContactButton", "Send");
+                            Redirect('/Contact/Success', 100);
+                        }, 2500);
+                    }
+                    else
+                    {
+                        HideSpinner("ContactButton", "Send");
+                        ContactResult.textContent = "Failed to send a message, please try again later.";
+                    }
+                }
+            });
+        }
+    });
+});
+
+//Handle Adding Voting Due Date Button POST's request using AJAX
+function InsertDueDate()
+{
+    let VotingConfigResult = document.getElementById('VotingConfigResult');
+    let DueDateValue = $('#DueDateValue').val();
+    console.log("DueDateValue: " + DueDateValue);
+    $.ajax
+    ({
+        type: "POST",
+        url: 'Dashboard/AddDueDate',
+        data: { DueDate: DueDateValue},
+        dataType: "json",
+        success: function (response)
+        {
+            console.log("Response: " + response.state)
+            if (response.state == 'Success')
+            {
+                $("#InsertDueDateButton").addClass("disabled");
+                $("#DeleteDueDateButton").removeClass("disabled");
+                VotingConfigResult.textContent = "Successfully added, the due date is set to: " + response.dueDate + ".";
+            }
+            else if (response.state == 'Invalid')
+            {
+                VotingConfigResult.textContent = "Invalid Due date, should be after current date.";
+            }
+            else
+            {
+                VotingConfigResult.textContent = "Failed to set due date, please try again later.";
+            }
+        }
+    });
+}
+
+//Handle Deleting Voting Due Date Button POST's request using AJAX
+function DeleteDueDate()
+{
+    let VotingConfigResult = document.getElementById('VotingConfigResult');
+    $.ajax
+    ({
+        type: "POST",
+        url: 'Dashboard/DeleteDueDate',
+        dataType: "json",
+        success: function (response)
+        {
+            console.log("Response DeleteDueDate: " + response.state)
+            if (response.state == 'Success')
+            {
+                $("#DeleteDueDateButton").addClass("disabled");
+                $("#InsertDueDateButton").removeClass("disabled");
+                VotingConfigResult.textContent = "Successfully deleted.";
+                $('#DueDateValue').val('');
+            }
+            else
+            {
+                VotingConfigResult.textContent = "Failed to delete.";
+            }
+        }
+    });
+}
+
+
+//Handle Result Count down
+$(document).ready(function () {
+
+    function getRemainingDays() {
+        return Date.parse($("#SpanDueDate").text());
+    }
+    function TestCountdown() {
+        return new Date(new Date().valueOf() + 60 * 60);
+    }
+    $('#clock-c').countdown(TestCountdown(), function (event) {
+        var $this = $(this).html(event.strftime(''
+            + '<span class="h1 font-weight-bold">%D</span> Day%!d'
+            + '<span class="h1 font-weight-bold">%H</span> Hr'
+            + '<span class="h1 font-weight-bold">%M</span> Min'
+            + '<span class="h1 font-weight-bold">%S</span> Sec'));
+    }).on('finish.countdown', function ()
+    {
+        console.log("Count down finished, attemtping to make ajax request");
+        $.ajax
+        ({
+            type: "POST",
+            url: 'Results/Check',
+            dataType: "json",
+            success: function (response)
+            {
+                console.log("Response from Check: " + response.state)
+                if (response.state == 'Success')
+                {
+                    console.log("Winner Candidate is: " + response.id);
+                    Redirect("/Results", 1000);
+                }
+                else
+                {
+                    console.log("Failed to get the winner candidate. Reason: " + response.reason);
+                }
+            }
+        });
+    });
+
+    $('#btn-pause').click(function () {
+        $('#clock-c').countdown('pause');
+    });
+    $('#btn-resume').click(function () {
+        $('#clock-c').countdown('resume');
+    });
+});

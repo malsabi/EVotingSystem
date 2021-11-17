@@ -680,13 +680,111 @@ namespace EVotingSystem.DataBase
         #region "Logging"
         public async void LogAdminEntry(LogEntry LogEntry)
         {
-            DocumentReference Document = FireStoreDataBase.Collection(Config.LoggerPath).Document(Config.AdminLogPath);
-            await Document.UpdateAsync("Logs", FieldValue.ArrayUnion(LogEntry));
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.LoggerPath).Document(Config.AdminLogPath);
+                await Document.UpdateAsync("Logs", FieldValue.ArrayUnion(LogEntry));
+            }
+            catch
+            {
+            }
         }
         public async void LogStudentEntry(LogEntry LogEntry)
         {
-            DocumentReference Document = FireStoreDataBase.Collection(Config.LoggerPath).Document(Config.StudentLogPath);
-            await Document.UpdateAsync("Logs", FieldValue.ArrayUnion(LogEntry));
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.LoggerPath).Document(Config.StudentLogPath);
+                await Document.UpdateAsync("Logs", FieldValue.ArrayUnion(LogEntry));
+            }
+            catch
+            {
+            }
+        }
+        #endregion
+
+        #region "Results"
+        public async void AddDueDate(ResultModel Result)
+        {
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.Results).Document(Config.Results);
+                await Document.SetAsync(Result);
+            }
+            catch
+            {
+            }
+        }
+
+        public async void UpdateResult(ResultModel Result)
+        {
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.Results).Document(Config.Results);
+                await Document.SetAsync(Result, SetOptions.Overwrite);
+            }
+            catch
+            {
+            }
+        }
+
+        public bool IsDueDateAdded()
+        {
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.Results).Document(Config.Results);
+                DocumentSnapshot SnapShot = Document.GetSnapshotAsync().Result;
+                if (SnapShot.Exists)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public void DeleteDueDate()
+        {
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.Results).Document(Config.Results);
+                Document.DeleteAsync();
+            }
+            catch
+            {
+            }
+        }
+
+        public ResultModel GetResult()
+        {
+            try
+            {
+                DocumentReference Document = FireStoreDataBase.Collection(Config.Results).Document(Config.Results);
+                DocumentSnapshot SnapShot = Document.GetSnapshotAsync().Result;
+                if (SnapShot.Exists)
+                {
+                    ResultModel Result = SnapShot.ConvertTo<ResultModel>();
+                    if (Result.WinnerCandidate != null)
+                    {
+                        Result.WinnerCandidate.DecryptProperties();
+                    }
+                    return Result;
+                }
+                else
+                {
+                    return new ResultModel();
+                }
+             
+            }
+            catch
+            {
+                return new ResultModel();
+            }
         }
         #endregion
         #endregion

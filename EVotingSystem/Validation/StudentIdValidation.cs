@@ -11,7 +11,7 @@ namespace EVotingSystem.Validation
         /// </summary>
         /// <param name="value">The value here represents the StudentId</param>
         /// <returns>True if the StudentId is valid otherwise false if the email is StudentId</returns>
-        public bool IsValid(object value)
+        public override bool IsValid(object value)
         {
             string StudentId = (string)value;
 
